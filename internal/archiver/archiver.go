@@ -85,7 +85,7 @@ func (a *Archiver) ActiveJobs() []string {
 	a.rlock("ActiveJobs")
 	defer a.runlock("ActiveJobs")
 	var ids []string
-	for id, _ := range a.active {
+	for id := range a.active {
 		ids = append(ids, id)
 	}
 	sort.Strings(ids)

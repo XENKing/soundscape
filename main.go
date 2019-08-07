@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/soundscapecloud/soundscape/internal/archiver"
-	"github.com/soundscapecloud/soundscape/internal/logtailer"
+	"github.com/xenking/soundscape/internal/archiver"
+	"github.com/xenking/soundscape/internal/logtailer"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -321,9 +321,9 @@ func main() {
 
 	// TLS
 	tlsConfig := tls.Config{
-		GetCertificate: certmanager.GetCertificate,
-		NextProtos:     []string{"http/1.1"},
-		Rand:           rand.Reader,
+		GetCertificate:           certmanager.GetCertificate,
+		NextProtos:               []string{"http/1.1"},
+		Rand:                     rand.Reader,
 		PreferServerCipherSuites: true,
 		MinVersion:               tls.VersionTLS12,
 		CipherSuites: []uint16{

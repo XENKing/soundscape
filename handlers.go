@@ -11,13 +11,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/soundscapecloud/soundscape/internal/archiver"
-	"github.com/soundscapecloud/soundscape/internal/youtube"
+	"github.com/xenking/soundscape/internal/archiver"
+	"github.com/xenking/soundscape/internal/youtube"
 
 	"github.com/disintegration/imaging"
 	"github.com/eduncan911/podcast"
+	"github.com/hikaruchang/ytdl"
 	"github.com/julienschmidt/httprouter"
-	"github.com/rylio/ytdl"
 )
 
 type Response struct {
@@ -210,7 +210,7 @@ func library(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		limit = 100
 	}
 	pages := []int64{}
-	var lastpage int64 = (total / limit) + 1
+	var lastpage = (total / limit) + 1
 	for i := int64(1); i <= lastpage; i++ {
 		pages = append(pages, i)
 	}
@@ -219,7 +219,7 @@ func library(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// chunk
-	var begin int64 = (page - 1) * limit
+	var begin = (page - 1) * limit
 	var end = begin + limit
 	if end > total {
 		end = total

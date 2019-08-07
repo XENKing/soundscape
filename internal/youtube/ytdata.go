@@ -32,9 +32,9 @@ type ytdata struct {
 								URLEndpoint struct {
 									URL string `json:"url"`
 								} `json:"urlEndpoint"`
-								WebNavigationEndpointData struct {
+								CommandMetadata struct {
 									URL string `json:"url"`
-								} `json:"webNavigationEndpointData"`
+								} `json:"commandMetadata"`
 							} `json:"navigationEndpoint,omitempty"`
 						} `json:"runs"`
 					} `json:"subtitle"`
@@ -67,9 +67,9 @@ type ytdata struct {
 								URLEndpoint struct {
 									URL string `json:"url"`
 								} `json:"urlEndpoint"`
-								WebNavigationEndpointData struct {
+								CommandMetadata struct {
 									URL string `json:"url"`
-								} `json:"webNavigationEndpointData"`
+								} `json:"commandMetadata"`
 							} `json:"navigationEndpoint,omitempty"`
 						} `json:"runs"`
 					} `json:"disclaimer"`
@@ -144,12 +144,14 @@ type ytdata struct {
 										} `json:"webThumbnailDetailsExtensionData"`
 									} `json:"thumbnail"`
 									Title struct {
+										Runs []struct {
+											Text string `json:"text"`
+										} `json:"runs"`
 										Accessibility struct {
 											AccessibilityData struct {
 												Label string `json:"label"`
 											} `json:"accessibilityData"`
 										} `json:"accessibility"`
-										SimpleText string `json:"simpleText"`
 									} `json:"title"`
 									DescriptionSnippet struct {
 										Runs []struct {
@@ -166,10 +168,12 @@ type ytdata struct {
 													BrowseID         string `json:"browseId"`
 													CanonicalBaseURL string `json:"canonicalBaseUrl"`
 												} `json:"browseEndpoint"`
-												WebNavigationEndpointData struct {
-													URL         string `json:"url"`
-													WebPageType string `json:"webPageType"`
-												} `json:"webNavigationEndpointData"`
+												CommandMetadata struct {
+													WebCommandMetadata struct {
+														URL         string `json:"url"`
+														WebPageType string `json:"webPageType"`
+													} `json:"webCommandMetadata"`
+												} `json:"commandMetadata"`
 											} `json:"navigationEndpoint"`
 										} `json:"runs"`
 									} `json:"longBylineText"`
@@ -192,10 +196,12 @@ type ytdata struct {
 										WatchEndpoint       struct {
 											VideoID string `json:"videoId"`
 										} `json:"watchEndpoint"`
-										WebNavigationEndpointData struct {
-											URL         string `json:"url"`
-											WebPageType string `json:"webPageType"`
-										} `json:"webNavigationEndpointData"`
+										CommandMetadata struct {
+											WebCommandMetadata struct {
+												URL         string `json:"url"`
+												WebPageType string `json:"webPageType"`
+											} `json:"webCommandMetadata"`
+										} `json:"commandMetadata"`
 									} `json:"navigationEndpoint"`
 									Badges []struct {
 										MetadataBadgeRenderer struct {
@@ -223,10 +229,12 @@ type ytdata struct {
 													BrowseID         string `json:"browseId"`
 													CanonicalBaseURL string `json:"canonicalBaseUrl"`
 												} `json:"browseEndpoint"`
-												WebNavigationEndpointData struct {
-													URL         string `json:"url"`
-													WebPageType string `json:"webPageType"`
-												} `json:"webNavigationEndpointData"`
+												CommandMetadata struct {
+													WebCommandMetadata struct {
+														URL         string `json:"url"`
+														WebPageType string `json:"webPageType"`
+													} `json:"webCommandMetadata"`
+												} `json:"commandMetadata"`
 											} `json:"navigationEndpoint"`
 										} `json:"runs"`
 									} `json:"ownerText"`
@@ -239,10 +247,12 @@ type ytdata struct {
 													BrowseID         string `json:"browseId"`
 													CanonicalBaseURL string `json:"canonicalBaseUrl"`
 												} `json:"browseEndpoint"`
-												WebNavigationEndpointData struct {
-													URL         string `json:"url"`
-													WebPageType string `json:"webPageType"`
-												} `json:"webNavigationEndpointData"`
+												CommandMetadata struct {
+													WebCommandMetadata struct {
+														URL         string `json:"url"`
+														WebPageType string `json:"webPageType"`
+													} `json:"webCommandMetadata"`
+												} `json:"commandMetadata"`
 											} `json:"navigationEndpoint"`
 										} `json:"runs"`
 									} `json:"shortBylineText"`
@@ -365,10 +375,12 @@ type ytdata struct {
 													Query  string `json:"query"`
 													Params string `json:"params"`
 												} `json:"searchEndpoint"`
-												WebNavigationEndpointData struct {
-													URL         string `json:"url"`
-													WebPageType string `json:"webPageType"`
-												} `json:"webNavigationEndpointData"`
+												CommandMetadata struct {
+													WebCommandMetadata struct {
+														URL         string `json:"url"`
+														WebPageType string `json:"webPageType"`
+													} `json:"webCommandMetadata"`
+												} `json:"commandMetadata"`
 											} `json:"navigationEndpoint"`
 											Tooltip        string `json:"tooltip"`
 											TrackingParams string `json:"trackingParams"`
@@ -442,10 +454,12 @@ type ytdata struct {
 						BrowseEndpoint      struct {
 							BrowseID string `json:"browseId"`
 						} `json:"browseEndpoint"`
-						WebNavigationEndpointData struct {
-							URL         string `json:"url"`
-							WebPageType string `json:"webPageType"`
-						} `json:"webNavigationEndpointData"`
+						CommandMetadata struct {
+							WebCommandMetadata struct {
+								URL         string `json:"url"`
+								WebPageType string `json:"webPageType"`
+							} `json:"webCommandMetadata"`
+						} `json:"commandMetadata"`
 					} `json:"endpoint"`
 					TrackingParams string `json:"trackingParams"`
 				} `json:"topbarLogoRenderer"`
@@ -474,10 +488,12 @@ type ytdata struct {
 						SearchEndpoint      struct {
 							Query string `json:"query"`
 						} `json:"searchEndpoint"`
-						WebNavigationEndpointData struct {
-							URL         string `json:"url"`
-							WebPageType string `json:"webPageType"`
-						} `json:"webNavigationEndpointData"`
+						CommandMetadata struct {
+							WebCommandMetadata struct {
+								URL         string `json:"url"`
+								WebPageType string `json:"webPageType"`
+							} `json:"webCommandMetadata"`
+						} `json:"commandMetadata"`
 					} `json:"searchEndpoint"`
 				} `json:"fusionSearchboxRenderer"`
 			} `json:"searchbox"`
@@ -498,14 +514,14 @@ type ytdata struct {
 								UploadEndpoint      struct {
 									Hack bool `json:"hack"`
 								} `json:"uploadEndpoint"`
-								WebNavigationEndpointData struct {
+								CommandMetadata struct {
 									URL string `json:"url"`
-								} `json:"webNavigationEndpointData"`
+								} `json:"commandMetadata"`
 							} `json:"nextEndpoint"`
 						} `json:"signInEndpoint"`
-						WebNavigationEndpointData struct {
+						CommandMetadata struct {
 							URL string `json:"url"`
-						} `json:"webNavigationEndpointData"`
+						} `json:"commandMetadata"`
 					} `json:"navigationEndpoint"`
 					Accessibility struct {
 						Label string `json:"label"`
@@ -542,9 +558,9 @@ type ytdata struct {
 													URL    string `json:"url"`
 													Target string `json:"target"`
 												} `json:"urlEndpoint"`
-												WebNavigationEndpointData struct {
+												CommandMetadata struct {
 													URL string `json:"url"`
-												} `json:"webNavigationEndpointData"`
+												} `json:"commandMetadata"`
 											} `json:"navigationEndpoint"`
 											TrackingParams string `json:"trackingParams"`
 										} `json:"compactLinkRenderer"`
