@@ -16,7 +16,7 @@ import (
 
 	"github.com/disintegration/imaging"
 	"github.com/eduncan911/podcast"
-	"github.com/hikaruchang/ytdl"
+	"github.com/SogoCZE/ytdl"
 	"github.com/julienschmidt/httprouter"
 )
 

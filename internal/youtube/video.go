@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rylio/ytdl"
-	//log "github.com/sirupsen/logrus"
+	"github.com/SogoCZE/ytdl"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -84,7 +84,9 @@ func (v Video) Download(ctx context.Context, dir string) error {
 	}
 
 	format := vi.Formats[0]
-	//for _, f := range vi.Formats { log.Printf("availabe format is %+v", f) }
+	for _, f := range vi.Formats {
+		log.Printf("availabe format is %+v", f)
+	}
 	dlurl, err := vi.GetDownloadURL(format)
 	if err != nil {
 		return err
