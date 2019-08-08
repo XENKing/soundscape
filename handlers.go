@@ -6,8 +6,8 @@ import (
 	"encoding/hex"
 	//"encoding/json"
 	"fmt"
-	"github.com/streamlist/streamlist/internal/archiver"
-	"github.com/streamlist/streamlist/internal/youtube"
+	"github.com/xenking/soundscape/internal/archiver"
+	"github.com/xenking/soundscape/internal/youtube"
 	//	"io/ioutil"
 	"net"
 	"net/http"
@@ -21,7 +21,7 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/eduncan911/podcast"
 	"github.com/julienschmidt/httprouter"
-	"github.com/rylio/ytdl"
+	"github.com/sogocze/ytdl"
 )
 
 // TODO
@@ -92,7 +92,7 @@ func newResponse(r *http.Request, ps httprouter.Params) *response {
 }
 
 func clearSession(w *http.ResponseWriter) {
-	deleteCookie := http.Cookie{Name: "X-Streamlist-Token", Value: "none", Expires: time.Now(), HttpOnly: true}
+	deleteCookie := http.Cookie{Name: "X-Soundscape-Token", Value: "none", Expires: time.Now(), HttpOnly: true}
 	http.SetCookie(*w, &deleteCookie)
 	return
 }
@@ -190,7 +190,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	password := r.FormValue("password")
 
 	// If token, refresh it and send response
-	reqToken, tokErr := r.Cookie("X-Streamlist-Token")
+	reqToken, tokErr := r.Cookie("X-Soundscape-Token")
 	if tokErr != http.ErrNoCookie {
 		token, err := jwt.Parse(reqToken.Value, func(t *jwt.Token) (interface{}, error) {
 			return []byte(secretKey), nil
@@ -199,7 +199,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 			juser = token.Claims.(jwt.MapClaims)["user"].(string)
 			ps = append(ps, httprouter.Param{Key: "user", Value: juser})
 			ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
-			w.Header().Set("X-Streamlist-Token", "*")
+			w.Header().Set("X-Soundscape-Token", "*")
 			redirect(w, r, "/")
 			return
 		} else {
@@ -235,9 +235,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 				if err != nil {
 					panic(err)
 				}
-				w.Header().Set("X-Streamlist-Token", "*")
+				w.Header().Set("X-Soundscape-Token", "*")
 				expireCookie := time.Now().Add(time.Hour * 8)
-				cookie := http.Cookie{Name: "X-Streamlist-Token", Value: tokenString, Expires: expireCookie, HttpOnly: true}
+				cookie := http.Cookie{Name: "X-Soundscape-Token", Value: tokenString, Expires: expireCookie, HttpOnly: true}
 				http.SetCookie(w, &cookie)
 				redirect(w, r, "/")
 				return
@@ -463,7 +463,7 @@ func podcastList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	baseurl := fmt.Sprintf("%s://%s%s", proto, httpHost, httpPrefix)
 
 	p := podcast.New(list.Title, baseurl, list.Title, &list.Created, &list.Modified)
-	p.AddAuthor(httpHost, "streamlist@"+httpHost)
+	p.AddAuthor(httpHost, "soundscape@"+httpHost)
 	p.AddImage(baseurl + "/logo.png")
 
 	for _, media := range list.Medias {

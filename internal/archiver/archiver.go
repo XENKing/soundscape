@@ -14,10 +14,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rylio/ytdl"
+	"github.com/sogocze/ytdl"
 
 	"go.uber.org/zap"
-	// "github.com/streamlist/streamlist/internal/youtube"
+	// "github.com/xenking/soundscape/internal/youtube"
 )
 
 var (

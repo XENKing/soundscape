@@ -89,7 +89,7 @@ func Search(query string) ([]Video, error) {
 		}
 
 		// title
-		title := vr.Title.SimpleText
+		title := vr.Title.Runs[0].Text
 		if title == "" {
 			return nil, fmt.Errorf("failed to find Title in ytdata")
 		}

@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/streamlist/streamlist/internal/archiver"
-	"github.com/streamlist/streamlist/internal/logtailer"
+	"github.com/xenking/soundscape/internal/archiver"
+	"github.com/xenking/soundscape/internal/logtailer"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -69,7 +69,7 @@ func init() {
 	cli.Var(&httpAdmins, "http-admin", "HTTP basic auth user/password for admins.")
 	cli.Var(&httpReadOnlys, "http-read-only", "HTTP basic auth user/password for read only users.")
 	cli.StringVar(&httpHost, "http-host", "", "HTTP host")
-	cli.StringVar(&httpPrefix, "http-prefix", "/streamlist", "HTTP URL prefix (not actually supported yet!)")
+	cli.StringVar(&httpPrefix, "http-prefix", "/soundscape", "HTTP URL prefix (not actually supported yet!)")
 	cli.BoolVar(&letsencrypt, "letsencrypt", false, "enable TLS using Let's Encrypt")
 	cli.StringVar(&reverseProxyAuthHeader, "reverse-proxy-header", "X-Authenticated-User", "reverse proxy auth header")
 	cli.StringVar(&reverseProxyAuthIP, "reverse-proxy-ip", "", "reverse proxy auth IP")
@@ -264,7 +264,7 @@ func main() {
 		if httpPort == "80" {
 			hostport = httpHost
 		}
-		logger.Infof("Streamlist (version: %s) %s", version, &url.URL{
+		logger.Infof("soundscape (version: %s) %s", version, &url.URL{
 			Scheme: "http",
 			Host:   hostport,
 			Path:   httpPrefix + "/",
@@ -347,7 +347,7 @@ func main() {
 	if httpPort == "443" {
 		hostport = httpHost
 	}
-	logger.Infof("Streamlist (version: %s) %s", version, &url.URL{
+	logger.Infof("soundscape (version: %s) %s", version, &url.URL{
 		Scheme: "https",
 		Host:   hostport,
 		Path:   httpPrefix + "/",

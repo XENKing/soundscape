@@ -1,6 +1,6 @@
 FROM golang:1.9-alpine as build
 RUN apk add --no-cache git gcc musl-dev
-WORKDIR /go/src/github.com/streamlist/streamlist
+WORKDIR /go/src/github.com/xenking/soundscape
 ARG STREAMLIST_VERSION=unknown
 ENV GODEBUG="netdns=go http2server=0"
 ENV GOPATH="/go"
@@ -12,7 +12,7 @@ RUN go get \
     github.com/dustin/go-humanize \
     github.com/julienschmidt/httprouter \
     github.com/eduncan911/podcast \
-    github.com/rylio/ytdl \
+    github.com/sogocze/ytdl \
     go.uber.org/zap \
     golang.org/x/crypto/acme/autocert \
     github.com/jinzhu/gorm \
@@ -29,11 +29,11 @@ RUN go fmt && \
     go vet --all && \
     go-bindata --pkg main static/... templates/...
 RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
-    go build -v --compiler gc --ldflags "-extldflags -static -s -w -X main.version=${STREAMLIST_VERSION}" -o /usr/bin/streamlist-linux-amd64
+    go build -v --compiler gc --ldflags "-extldflags -static -s -w -X main.version=${STREAMLIST_VERSION}" -o /usr/bin/soundscape-linux-amd64
 #RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 \
-#    go build -v --compiler gc --ldflags "-extldflags -static -s -w -X main.version=${STREAMLIST_VERSION}" -o /usr/bin/streamlist-linux-armv7
+#    go build -v --compiler gc --ldflags "-extldflags -static -s -w -X main.version=${STREAMLIST_VERSION}" -o /usr/bin/soundscape-linux-armv7
 #RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
-#    go build -v --compiler gc --ldflags "-extldflags -static -s -w -X main.version=${STREAMLIST_VERSION}" -o /usr/bin/streamlist-linux-arm64
+#    go build -v --compiler gc --ldflags "-extldflags -static -s -w -X main.version=${STREAMLIST_VERSION}" -o /usr/bin/soundscape-linux-arm64
 
 FROM alpine:latest
 RUN apk --no-cache add \
@@ -41,6 +41,6 @@ RUN apk --no-cache add \
     ffmpeg \
     wget
 WORKDIR /data
-COPY --from=build /usr/bin/streamlist-linux-amd64 /usr/bin/streamlist
+COPY --from=build /usr/bin/soundscape-linux-amd64 /usr/bin/soundscape
 EXPOSE 80
-ENTRYPOINT ["/usr/bin/streamlist"]
+ENTRYPOINT ["/usr/bin/soundscape"]

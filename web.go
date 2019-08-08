@@ -76,7 +76,7 @@ var (
                 <title>Error</title>
             </head>
             <body>
-                <h2 style="color: orangered;">An error has occurred. <a href="/streamlist/logs">Check the logs</a></h2>
+                <h2 style="color: orangered;">An error has occurred. <a href="/soundscape/logs">Check the logs</a></h2>
             </body>
         </html>
     `
@@ -132,7 +132,7 @@ func auth(h httprouter.Handle, role string) httprouter.Handle {
 		}
 
 		// If token, refresh it and send response
-		reqToken, tokErr := r.Cookie("X-Streamlist-Token")
+		reqToken, tokErr := r.Cookie("X-Soundscape-Token")
 		if tokErr != http.ErrNoCookie {
 			token, err := jwt.Parse(reqToken.Value, func(t *jwt.Token) (interface{}, error) {
 				return []byte(secretKey), nil
@@ -141,7 +141,7 @@ func auth(h httprouter.Handle, role string) httprouter.Handle {
 				juser = token.Claims.(jwt.MapClaims)["user"].(string)
 				ps = append(ps, httprouter.Param{Key: "user", Value: juser})
 				ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
-				w.Header().Set("X-Streamlist-Token", "*")
+				w.Header().Set("X-Soundscape-Token", "*")
 			} else {
 				redirect(w, r, "/logout")
 			}

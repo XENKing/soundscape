@@ -44,20 +44,20 @@
         </div>
         {{if $.User}}
             <div class="ui three large black icon buttons">
-                <a class="ui icon button" href="/streamlist/shuffle/{{$.List.ID}}"><i class="random icon"></i></a>
+                <a class="ui icon button" href="/soundscape/shuffle/{{$.List.ID}}"><i class="random icon"></i></a>
                 <button class="ui button"></button>
-                <a class="ui icon button" rel="alternate" type="application/rss+xml" href="/streamlist/podcast/{{$.List.ID}}"><i class="podcast icon"></i></a>
+                <a class="ui icon button" rel="alternate" type="application/rss+xml" href="/soundscape/podcast/{{$.List.ID}}"><i class="podcast icon"></i></a>
             </div>
         {{end}}
     </div>
 
 
     <!--h5 class="ui center aligned header">
-        <i class="help inverted icon" data-tooltip="Private podcast URL (e.g. Podcast -> Add Podcast URL)"></i><a rel="alternate" type="application/rss+xml" href="/streamlist/podcast/{{$.List.ID}}">https://{{$.HTTPHost}}<span></span>/streamlist/podcast/{{$.List.ID}}</a>
+        <i class="help inverted icon" data-tooltip="Private podcast URL (e.g. Podcast -> Add Podcast URL)"></i><a rel="alternate" type="application/rss+xml" href="/soundscape/podcast/{{$.List.ID}}">https://{{$.HTTPHost}}<span></span>/soundscape/podcast/{{$.List.ID}}</a>
     </h5-->
 
     <!--h5 class="ui center aligned header">
-        <a rel="alternate" type="application/mpegurl" href="/streamlist/m3u/{{$.List.ID}}">https://{{$.HTTPHost}}<span></span>/streamlist/m3u/{{$.List.ID}}</a>
+        <a rel="alternate" type="application/mpegurl" href="/soundscape/m3u/{{$.List.ID}}">https://{{$.HTTPHost}}<span></span>/streamlist/m3u/{{$.List.ID}}</a>
         <span data-tooltip="Private playlist URL (e.g. VLC -> Open Network Stream)">
             <i class="bordered help inverted icon"></i>
         </span>

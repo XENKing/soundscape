@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rylio/ytdl"
-	//log "github.com/Sirupsen/logrus"
+	"github.com/sogocze/ytdl"
+	log "github.com/Sirupsen/logrus"
 )
 
 var (
