@@ -46,6 +46,7 @@
             <div class="ui three large black icon buttons">
                 <a class="ui icon button" href="/soundscape/shuffle/{{$.List.ID}}"><i class="random icon"></i></a>
                 <button class="ui button"></button>
+                <a class="ui icon button" rel="alternate" type="application/mpegurl" href="/soundscape/m3u/{{$.List.ID}}">Open m3u</a>
                 <a class="ui icon button" rel="alternate" type="application/rss+xml" href="/soundscape/podcast/{{$.List.ID}}"><i class="podcast icon"></i></a>
             </div>
         {{end}}
@@ -57,7 +58,7 @@
     </h5-->
 
     <!--h5 class="ui center aligned header">
-        <a rel="alternate" type="application/mpegurl" href="/soundscape/m3u/{{$.List.ID}}">https://{{$.HTTPHost}}<span></span>/soundscape/m3u/{{$.List.ID}}</a>
+        <a rel="alternate" type="application/mpegurl" href="/soundscape/m3u/{{$.List.ID}}">Open m3u</a>
         <span data-tooltip="Private playlist URL (e.g. VLC -> Open Network Stream)">
             <i class="bordered help inverted icon"></i>
         </span>

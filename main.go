@@ -3,6 +3,8 @@ package main
 import (
 	"crypto/rand"
 	"crypto/tls"
+	"crypto/sha512"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"net"
@@ -32,6 +34,9 @@ var (
 	debug                  bool
 	showVersion            bool
 	httpAddr               string
+	httpAdmins             arrayFlags
+	httpAdminUsers         []string
+	httpReadOnlys          arrayFlags
 	httpHost               string
 	httpPrefix             string
 	httpUsername           string
@@ -61,6 +66,7 @@ var (
 )
 
 func init() {
+	dbInit()
 	cli.StringVar(&backlink, "backlink", "", "backlink (optional)")
 	cli.StringVar(&datadir, "data-dir", "/data", "data directory")
 	cli.BoolVar(&debug, "debug", false, "debug mode")
@@ -68,6 +74,8 @@ func init() {
 	cli.StringVar(&httpAddr, "http-addr", ":80", "listen address")
 	cli.StringVar(&httpHost, "http-host", "", "HTTP host")
 	cli.StringVar(&httpUsername, "http-username", "soundscape", "HTTP basic auth username")
+	cli.Var(&httpAdmins, "http-admin", "HTTP basic auth user/password for admins.")
+	cli.Var(&httpReadOnlys, "http-read-only", "HTTP basic auth user/password for read only users.")
 	cli.StringVar(&httpPrefix, "http-prefix", "/soundscape", "HTTP URL prefix (not actually supported yet!)")
 	cli.BoolVar(&letsencrypt, "letsencrypt", false, "enable TLS using Let's Encrypt")
 	cli.StringVar(&reverseProxyAuthHeader, "reverse-proxy-header", "X-Authenticated-User", "reverse proxy auth header")
@@ -82,6 +90,27 @@ func main() {
 	if showVersion {
 		fmt.Printf("Soundscape version: %s", version)
 		os.Exit(0)
+	}
+
+	// Create users in db if not exists, or set password and role if needed
+	for _, httpUser := range httpAdmins {
+		split := strings.Split(httpUser, ":")
+		httpUsername := split[0]
+		httpUserPassword := split[1]
+		hasher := sha512.New()
+		hasher.Write([]byte(httpUserPassword))
+		httpAdminUsers = append(httpAdminUsers, httpUsername)
+		var user User
+		db.Where(User{Username: httpUsername}).Assign(User{Password: hex.EncodeToString(hasher.Sum(nil)), Role: "admin"}).FirstOrCreate(&user)
+	}
+	for _, httpUser := range httpReadOnlys {
+		split := strings.Split(httpUser, ":")
+		httpUsername := split[0]
+		httpUserPassword := split[1]
+		hasher := sha512.New()
+		hasher.Write([]byte(httpUserPassword))
+		var user User
+		db.Where(User{Username: httpUsername}).Assign(User{Password: hex.EncodeToString(hasher.Sum(nil)), Role: "readonly"}).FirstOrCreate(&user)
 	}
 
 	// logtailer
@@ -155,6 +184,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	// http admin
+	if httpAdmins == nil && reverseProxyAuthIP == "" {
+		usage("the --http-admin or the --reverseProxyAuthIP flag is required")
+	}
+
 	// http host
 	if httpHost == "" {
 		usage("the --http-host flag is required")
@@ -181,81 +215,88 @@ func main() {
 	r.HandleMethodNotAllowed = false
 
 	// Handlers
-	r.GET("/", Log(Auth(index, false)))
-	r.GET(Prefix("/logs"), Log(Auth(logs, false)))
-	r.GET(Prefix("/"), Log(Auth(home, false)))
-	r.GET(Prefix(""), Log(Auth(home, false)))
+	r.GET("/", Log(Auth(index, "admin")))
+	r.GET(Prefix("/logs"), Log(Auth(logs, "admin")))
+	r.GET(Prefix("/"), Log(Auth(home, "readonly")))
+	r.GET(Prefix(""), Log(Auth(home, "readonly")))
 
-	// Library
-	r.GET(Prefix("/library"), Log(Auth(library, false)))
+	// Login
+	r.GET(Prefix("/login"), Log(Auth(loginHandler, "none")))
+	r.POST(Prefix("/login"), Log(Auth(loginHandler, "none")))
+
+	// Logout
+	r.GET(Prefix("/logout"), Log(Auth(logoutHandler, "none")))
 
 	// Help
-	r.GET(Prefix("/help"), Log(Auth(help, false)))
+	r.GET(Prefix("/help"), Log(Auth(help, "none")))
+
+	// Library
+	r.GET(Prefix("/library"), Log(Auth(library, "readonly")))
 
 	// Media
-	r.GET(Prefix("/media/thumbnail/:media"), Log(Auth(thumbnailMedia, false)))
-	r.GET(Prefix("/media/view/:media"), Log(Auth(viewMedia, false)))
-	r.GET(Prefix("/media/delete/:media"), Log(Auth(deleteMedia, false)))
-	r.GET(Prefix("/media/access/:filename"), Auth(streamMedia, false))
-	r.GET(Prefix("/media/download/:media"), Auth(downloadMedia, false))
+	r.GET(Prefix("/media/thumbnail/:media"), Log(Auth(thumbnailMedia, "readonly")))
+	r.GET(Prefix("/media/view/:media"), Log(Auth(viewMedia, "readonly")))
+	r.GET(Prefix("/media/delete/:media"), Log(Auth(deleteMedia, "admin")))
+	r.GET(Prefix("/media/access/:filename"), Auth(streamMedia, "readonly"))
+	r.GET(Prefix("/media/download/:media"), Auth(downloadMedia, "readonly"))
 
 	// Publicly accessible streaming (using playlist id as "auth")
-	r.GET(Prefix("/stream/:list/:filename"), Auth(streamMedia, true))
+	r.GET(Prefix("/stream/:list/:filename"), Auth(streamMedia, "none"))
 
 	// Import
-	r.GET(Prefix("/import"), Log(Auth(importHandler, false)))
+	r.GET(Prefix("/import"), Log(Auth(importHandler, "admin")))
 
 	// Archiver
-	r.GET(Prefix("/archiver/jobs"), Auth(archiverJobs, false))
-	r.POST(Prefix("/archiver/save/:id"), Log(Auth(archiverSave, false)))
-	r.GET(Prefix("/archiver/cancel/:id"), Log(Auth(archiverCancel, false)))
+	r.GET(Prefix("/archiver/jobs"), Auth(archiverJobs, "admin"))
+	r.POST(Prefix("/archiver/save/:id"), Log(Auth(archiverSave, "admin")))
+	r.GET(Prefix("/archiver/cancel/:id"), Log(Auth(archiverCancel, "admin")))
 
 	// List
-	r.GET(Prefix("/create"), Log(Auth(createList, false)))
-	r.POST(Prefix("/create"), Log(Auth(createList, false)))
-	r.POST(Prefix("/add/:list/:media"), Log(Auth(addMediaList, false)))
-	r.POST(Prefix("/remove/:list/:media"), Log(Auth(removeMediaList, false)))
-	r.GET(Prefix("/remove/:list/:media"), Log(Auth(removeMediaList, false)))
+	r.GET(Prefix("/create"), Log(Auth(createList, "admin")))
+	r.POST(Prefix("/create"), Log(Auth(createList, "admin")))
+	r.POST(Prefix("/add/:list/:media"), Log(Auth(addMediaList, "admin")))
+	r.POST(Prefix("/remove/:list/:media"), Log(Auth(removeMediaList, "admin")))
+	r.GET(Prefix("/remove/:list/:media"), Log(Auth(removeMediaList, "admin")))
 
-	r.GET(Prefix("/edit/:id"), Log(Auth(editList, false)))
-	r.POST(Prefix("/edit/:id"), Log(Auth(editList, false)))
-	r.GET(Prefix("/shuffle/:id"), Log(Auth(shuffleList, false)))
-	r.GET(Prefix("/play/:id"), Log(Auth(playList, true)))
-	r.GET(Prefix("/m3u/:id"), Log(Auth(m3uList, true)))
-	r.GET(Prefix("/podcast/:id"), Log(Auth(podcastList, true)))
+	r.GET(Prefix("/edit/:id"), Log(Auth(editList, "admin")))
+	r.POST(Prefix("/edit/:id"), Log(Auth(editList, "admin")))
+	r.GET(Prefix("/shuffle/:id"), Log(Auth(shuffleList, "admin")))
+	r.GET(Prefix("/play/:id"), Log(Auth(playList, "none")))
+	r.GET(Prefix("/m3u/:id"), Log(Auth(m3uList, "none")))
+	r.GET(Prefix("/podcast/:id"), Log(Auth(podcastList, "none")))
 
-	r.POST(Prefix("/config"), Log(Auth(configHandler, false)))
+	r.POST(Prefix("/config"), Log(Auth(configHandler, "admin")))
 
-	r.GET(Prefix("/delete/:id"), Log(Auth(deleteList, false)))
+	r.GET(Prefix("/delete/:id"), Log(Auth(deleteList, "admin")))
 
 	// API
-	r.GET(Prefix("/v1/status"), Log(Auth(v1status, true)))
+	r.GET(Prefix("/v1/status"), Log(Auth(v1status, "none")))
 
 	// Subsonic API
-	r.GET("/rest/ping.view", Log(Auth(subsonicPing, true)))
-	r.POST("/rest/ping.view", Log(Auth(subsonicPing, true)))
+	r.GET("/rest/ping.view", Log(Auth(subsonicPing, "none")))
+	r.POST("/rest/ping.view", Log(Auth(subsonicPing, "none")))
 
-	r.GET("/rest/getMusicFolders.view", Log(Auth(subsonicGetMusicFolders, true)))
-	r.POST("/rest/getMusicFolders.view", Log(Auth(subsonicGetMusicFolders, true)))
+	r.GET("/rest/getMusicFolders.view", Log(Auth(subsonicGetMusicFolders, "none")))
+	r.POST("/rest/getMusicFolders.view", Log(Auth(subsonicGetMusicFolders, "none")))
 
-	r.GET("/rest/getIndexes.view", Log(Auth(subsonicGetIndexes, true)))
-	r.POST("/rest/getIndexes.view", Log(Auth(subsonicGetIndexes, true)))
+	r.GET("/rest/getIndexes.view", Log(Auth(subsonicGetIndexes, "none")))
+	r.POST("/rest/getIndexes.view", Log(Auth(subsonicGetIndexes, "none")))
 
-	r.GET("/rest/getPlaylists.view", Log(Auth(subsonicGetPlaylists, true)))
-	r.POST("/rest/getPlaylists.view", Log(Auth(subsonicGetPlaylists, true)))
+	r.GET("/rest/getPlaylists.view", Log(Auth(subsonicGetPlaylists, "none")))
+	r.POST("/rest/getPlaylists.view", Log(Auth(subsonicGetPlaylists, "none")))
 
-	r.GET("/rest/getPlaylist.view", Log(Auth(subsonicGetPlaylist, true)))
-	r.POST("/rest/getPlaylist.view", Log(Auth(subsonicGetPlaylist, true)))
+	r.GET("/rest/getPlaylist.view", Log(Auth(subsonicGetPlaylist, "none")))
+	r.POST("/rest/getPlaylist.view", Log(Auth(subsonicGetPlaylist, "none")))
 
-	r.GET("/rest/getCoverArt.view", Log(Auth(subsonicGetCoverArt, true)))
-	r.POST("/rest/getCoverArt.view", Log(Auth(subsonicGetCoverArt, true)))
+	r.GET("/rest/getCoverArt.view", Log(Auth(subsonicGetCoverArt, "none")))
+	r.POST("/rest/getCoverArt.view", Log(Auth(subsonicGetCoverArt, "none")))
 
-	r.GET("/rest/getLyrics.view", Log(Auth(subsonicGetLyrics, true)))
-	r.POST("/rest/getLyrics.view", Log(Auth(subsonicGetLyrics, true)))
+	r.GET("/rest/getLyrics.view", Log(Auth(subsonicGetLyrics, "none")))
+	r.POST("/rest/getLyrics.view", Log(Auth(subsonicGetLyrics, "none")))
 
 	// Assets
-	r.GET(Prefix("/static/*path"), Auth(staticAsset, true)) // TODO: Auth() but by checking Origin/Referer for a valid playlist ID?
-	r.GET(Prefix("/logo.png"), Log(Auth(logo, true)))
+	r.GET(Prefix("/static/*path"), Auth(staticAsset, "none")) // TODO: Auth() but by checking Origin/Referer for a valid playlist ID?
+	r.GET(Prefix("/logo.png"), Log(Auth(logo, "none")))
 
 	//
 	// Server
@@ -384,4 +425,15 @@ func (l tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 	tc.SetKeepAlive(true)
 	tc.SetKeepAlivePeriod(10 * time.Minute)
 	return tc, nil
+}
+
+type arrayFlags []string
+
+func (i *arrayFlags) String() string {
+	return "my string representation"
+}
+
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
 }

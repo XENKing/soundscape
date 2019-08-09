@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /go/src/github.com/xenking/soundscape
 
-ARG BUILD_VERSION=unknown
+ARG BUILD_VERSION=2.1
 
 ENV GODEBUG="netdns=go http2server=0"
 ENV GOPATH="/go"
@@ -18,9 +18,15 @@ RUN go get \
     github.com/dustin/go-humanize \
     github.com/julienschmidt/httprouter \
     github.com/eduncan911/podcast \
-    github.com/SogoCZE/ytdl \
+    github.com/sogocze/ytdl \
     go.uber.org/zap \
-    golang.org/x/crypto/acme/autocert
+    golang.org/x/crypto/acme/autocert \
+    github.com/jinzhu/gorm \
+    github.com/jinzhu/gorm/dialects/sqlite \
+    github.com/go-sql-driver/mysql \
+    github.com/gorilla/securecookie \
+    github.com/dgrijalva/jwt-go \
+    golang.org/x/crypto/bcrypt
 
 COPY *.go ./
 COPY internal ./internal
@@ -31,7 +37,7 @@ RUN go fmt && \
     go vet --all && \
     go-bindata --pkg main static/... templates/...
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 \
     go build -v --compiler gc --ldflags "-extldflags -static -s -w -X main.version=${BUILD_VERSION}" -o /usr/bin/soundscape-linux-amd64
 
 #RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 \

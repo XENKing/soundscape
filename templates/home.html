@@ -2,7 +2,9 @@
 
 <div class="ui container">
     <div class="ui hidden clearing divider"></div>
+    {{if eq $.IsAdmin "admin"}}
     <a class="ui right floated large green button" href="/soundscape/create"><i class="plus icon"></i>New Playlist</a>
+    {{end}}
     <h2 class="ui header">Playlists</h2>
 
     <div class="ui hidden divider"></div>
@@ -25,9 +27,11 @@
                             {{end}}
                         </a>
                         <div class="extra content">
+                            {{if eq $.IsAdmin "admin"}}
                             <div class="meta">
                                 <a class="right floated meta" href="/soundscape/edit/{{$list.ID}}"><i class="setting icon"></i> Edit</a>
                             </div>
+                            {{end}}
                             <div class="category">
                                 {{if $mediacount}}
                                     {{with $tl := $list.TotalLength}}{{duration $tl}}{{end}}

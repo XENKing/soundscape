@@ -6,7 +6,10 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"crypto/sha512"
+	"encoding/hex"
 	"os"
+	"time"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -14,9 +17,10 @@ import (
 	"github.com/xenking/soundscape/internal/archiver"
 	"github.com/xenking/soundscape/internal/youtube"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/disintegration/imaging"
 	"github.com/eduncan911/podcast"
-	"github.com/SogoCZE/ytdl"
+	"github.com/sogocze/ytdl"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -32,6 +36,7 @@ type Response struct {
 
 	Error   string
 	User    string
+	IsAdmin string
 	Section string
 
 	// Paging
@@ -55,6 +60,17 @@ type Response struct {
 	Youtubes []youtube.Video
 }
 
+const secretKey string = "ThisIsTooSecret"
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func NewResponse(r *http.Request, ps httprouter.Params) *Response {
 	diskInfo, err := NewDiskInfo(datadir)
 	if err != nil {
@@ -65,12 +81,19 @@ func NewResponse(r *http.Request, ps httprouter.Params) *Response {
 		Request:  r,
 		Params:   &ps,
 		User:     ps.ByName("user"),
+		IsAdmin:  ps.ByName("role"),
 		HTTPHost: httpHost,
 		Version:  version,
 		Backlink: backlink,
 		DiskInfo: diskInfo,
 		Archiver: archive,
 	}
+}
+
+func clearSession(w *http.ResponseWriter) {
+	deleteCookie := http.Cookie{Name: "X-Soundscape-Token", Value: "none", Expires: time.Now(), HttpOnly: true}
+	http.SetCookie(*w, &deleteCookie)
+	return
 }
 
 func logs(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -84,6 +107,13 @@ func index(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	Redirect(w, r, "/")
 }
 
+/*func createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// Create a user
+	u1 := User{Username: "admin", Password: "admin"}
+	db.Create(&u1)
+	fmt.Fprintln(w, "user created")
+}
+*/
 func home(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Accept TOS
 	if r.FormValue("tos") == "yes" {
@@ -164,6 +194,81 @@ func help(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	res := NewResponse(r, ps)
 	res.Section = "help"
 	HTML(w, "help.html", res)
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+	if r.Method == "GET" {
+		res := NewResponse(r, ps)
+		res.Section = "login"
+		HTML(w, "login.html", res)
+		return
+	}
+
+	var juser string
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	// If token, refresh it and send response
+	reqToken, tokErr := r.Cookie("X-Soundscape-Token")
+	if tokErr != http.ErrNoCookie {
+		token, err := jwt.Parse(reqToken.Value, func(t *jwt.Token) (interface{}, error) {
+			return []byte(secretKey), nil
+		})
+		if err == nil && token.Valid {
+			juser = token.Claims.(jwt.MapClaims)["user"].(string)
+			ps = append(ps, httprouter.Param{Key: "user", Value: juser})
+			ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
+			w.Header().Set("X-Soundscape-Token", "*")
+			Redirect(w, r, "/")
+			return
+		} else {
+			Redirect(w, r, "/logout")
+			return
+		}
+	} else {
+		var dbuser User
+		if err := db.Where(&User{Username: username}).First(&dbuser).Error; err != nil {
+			// user doesn't exists
+			Redirect(w, r, "/logout")
+			return
+		} else {
+			// user exists, check password
+			hasher := sha512.New()
+			hasher.Write([]byte(password))
+			newHash := hex.EncodeToString(hasher.Sum(nil))
+			if dbuser.Password != newHash {
+				// Bad password
+				Redirect(w, r, "/logout")
+				return
+			} else {
+				// Good password
+				// Create JWT token
+				token := jwt.New(jwt.GetSigningMethod("HS256"))
+				claims := make(jwt.MapClaims)
+				claims["user"] = dbuser.Username
+				claims["exp"] = time.Now().Add(time.Minute * 3600).Unix()
+				token.Claims = claims
+				tokenString, err := token.SignedString([]byte(secretKey))
+				ps = append(ps, httprouter.Param{Key: "user", Value: username})
+				ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
+				if err != nil {
+					panic(err)
+				}
+				w.Header().Set("X-Soundscape-Token", "*")
+				expireCookie := time.Now().Add(time.Hour * 72)
+				cookie := http.Cookie{Name: "X-Soundscape-Token", Value: tokenString, Expires: expireCookie, HttpOnly: true}
+				http.SetCookie(w, &cookie)
+				Redirect(w, r, "/")
+				return
+			}
+		}
+	}
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	clearSession(&w)
+	Redirect(w, r, "/login")
 }
 
 func library(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -455,6 +560,9 @@ func playList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	res := NewResponse(r, ps)
 	res.List = list
 	res.Section = "play"
+	var medias []*Media
+	db.Model(&list).Related(&medias, "Medias")
+	res.Medias = medias
 	HTML(w, "play.html", res)
 }
 
@@ -540,6 +648,9 @@ func editList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	res := NewResponse(r, ps)
 	res.List = list
 	res.Section = "edit"
+	var medias []*Media
+	db.Model(&list).Related(&medias, "Medias")
+	res.Medias = medias
 	HTML(w, "edit.html", res)
 }
 

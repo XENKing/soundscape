@@ -35,15 +35,17 @@
                             {{range $list := $.Lists}}
                                 <div class="listbox">
                                     {{$hasmedia := $list.HasMedia $media}}
-                                    <button {{if $hasmedia}}style="display: none;"{{end}} class="toggler ui mini basic button" data-url="/soundscape/add/{{$list.ID}}/{{$media.ID}}"><i class="square outline icon"></i> {{$list.Title}}</button>
-                                    <button {{if not $hasmedia}}style="display: none;"{{end}} class="toggler ui mini green button" data-url="/soundscape/remove/{{$list.ID}}/{{$media.ID}}"><i class="checkmark box icon"></i> {{$list.Title}}</button>
+                                    <button {{if $hasmedia}}style="display: none;"{{end}} class="{{if eq $.IsAdmin "admin"}}toggler {{end}}ui mini basic button" {{if eq $.IsAdmin "admin"}}data-url="/soundscape/add/{{$list.ID}}/{{$media.ID}}"{{end}}><i class="square outline icon"></i> {{$list.Title}}</button>
+                                    <button {{if not $hasmedia}}style="display: none;"{{end}} class="{{if eq $.IsAdmin "admin"}}toggler {{end}}ui mini green button" {{if eq $.IsAdmin "admin"}}data-url="/soundscape/remove/{{$list.ID}}/{{$media.ID}}"{{end}}><i class="checkmark box icon"></i> {{$list.Title}}</button>
                                 </div>
                             {{end}}
                         </td>
                         <td class="right aligned four wide">
                             {{duration $media.Length}}
+                            {{if $.IsAdmin}}
                             &nbsp;&nbsp;
                             <a href="/soundscape/media/delete/{{$media.ID}}?p={{$.Page}}&q={{$.Query}}" data-prompt="Delete {{$media.Title}}?" class="confirm"><i class="red trash icon"></i></a>
+                            {{end}}
                         </td>
                     </tr>
                 {{end}}
@@ -65,6 +67,8 @@
                 </div>
             </div>
             <div class="ui hidden divider"></div>
+        {{else}}
+            {{template "intro.html" .}}
         {{end}}
     {{end}}
 

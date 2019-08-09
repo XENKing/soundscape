@@ -5,11 +5,12 @@ import (
 	"encoding/xml"
 	"fmt"
 	"html/template"
-	"net"
+	//"net"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/julienschmidt/httprouter"
 )
@@ -103,7 +104,7 @@ func Log(h httprouter.Handle) httprouter.Handle {
 	}
 }
 
-func Auth(h httprouter.Handle, optional bool) httprouter.Handle {
+/*func Auth(h httprouter.Handle, optional bool) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		user := ""
 
@@ -149,6 +150,37 @@ func Auth(h httprouter.Handle, optional bool) httprouter.Handle {
 		// Add "user" to params.
 		if user != "" {
 			ps = append(ps, httprouter.Param{Key: "user", Value: user})
+		}
+		h(w, r, ps)
+	}
+}*/
+
+func Auth(h httprouter.Handle, role string) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+		var juser string
+
+		if role == "none" {
+			h(w, r, ps)
+			return
+		}
+
+		// If token, refresh it and send response
+		reqToken, tokErr := r.Cookie("X-Soundscape-Token")
+		if tokErr != http.ErrNoCookie {
+			token, err := jwt.Parse(reqToken.Value, func(t *jwt.Token) (interface{}, error) {
+				return []byte(secretKey), nil
+			})
+			if err == nil && token.Valid {
+				juser = token.Claims.(jwt.MapClaims)["user"].(string)
+				ps = append(ps, httprouter.Param{Key: "user", Value: juser})
+				ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
+				w.Header().Set("X-Soundscape-Token", "*")
+			} else {
+				Redirect(w, r, "/logout")
+			}
+		} else {
+			Redirect(w, r, "/logout")
 		}
 		h(w, r, ps)
 	}

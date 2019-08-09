@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+    <html lang="en">
     <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <meta name="referrer" content="origin">
         <link rel="icon" href="/soundscape/static/logo.png">
@@ -19,29 +19,35 @@
     </head>
     <body>
 
-        {{if $.User}}
-            {{if $.Config.Get.AcceptTOS}}
-                <div class="navmenu ui inverted small menu">
-                    {{if $.Backlink}}
-                        <a class="item" href="{{.Backlink}}"><i class="large home icon"></i></a>
-                    {{end}}
-                    <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="/soundscape/">Playlists</a>
-                    <a class="item {{if eq $.Section "library"}}active{{end}}" href="/soundscape/library">Library</a>
+    {{if $.User}}
+        {{if $.Config.Get.AcceptTOS}}
+            <div class="navmenu ui inverted small menu">
+                {{if $.Backlink}}
+                    <a class="item" href="{{.Backlink}}"><i class="large home icon"></i></a>
+                {{end}}
+                <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="/soundscape/">Playlists</a>
+                <a class="item {{if eq $.Section "library"}}active{{end}}" href="/soundscape/library">Library</a>
+                {{if eq $.IsAdmin "admin"}}
                     <a class="item {{if eq $.Section "import"}}active{{end}}" href="/soundscape/import">Import</a>
-                    <a class="item {{if eq $.Section "create"}}active{{end}}" href="/soundscape/create"><i class="fitted plus icon"></i></a>
-                    <div class="ui right dropdown item">
-                        <img src="/soundscape/static/logo.png">
-                        <div class="menu">
-                            <a target="_blank" class="item" href="https://github.com/soundscapecloud/soundscape"><i class="github icon"></i>Open Source</a>
-                            <a href="/soundscape/help" class="{{if eq $.Section "help"}}active{{end}} item"><i class="help icon"></i>Help</a>
-                        </div>
+                {{end}}
+                <a class="item {{if eq $.Section "create"}}active{{end}}" href="/soundscape/create"><i
+                            class="fitted plus icon"></i></a>
+                <div class="ui right dropdown item">
+                    <img src="/soundscape/static/logo.png">
+                    <div class="menu">
+                        <a href="/soundscape/logout" class="item"><i class="power icon"></i>Log out</a>
+                        <a target="_blank" class="item" href="https://github.com/xenking/soundscape"><i
+                                    class="github icon"></i>Open Source</a>
+                        <a href="/soundscape/help" class="{{if eq $.Section "help"}}active{{end}} item"><i
+                                    class="help icon"></i>Help</a>
                     </div>
                 </div>
-            {{else}}
-                <div class="ui hidden divider"></div>
-            {{end}}
+            </div>
+        {{else}}
+            <div class="ui hidden divider"></div>
         {{end}}
-
+    {{end}}
+    {{if $.User}}
         {{with $message := $.Request.FormValue "message"}}
             <div class="ui container">
                 <div class="ui positive message">
@@ -82,5 +88,5 @@
                 <div class="ui hidden divider"></div>
             </div>
         {{end}}
-
-        <div class="full height">
+    {{end}}
+    <div class="full height">

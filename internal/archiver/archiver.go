@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SogoCZE/ytdl"
+	"github.com/sogocze/ytdl"
 
 	"go.uber.org/zap"
 	// "github.com/soundscapecloud/soundscape/internal/youtube"
