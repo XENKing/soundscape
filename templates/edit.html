@@ -5,10 +5,10 @@
     <h2 class="ui header">Editing &quot;{{$.List.Title}}&quot;</h2>
     <div class="ui hidden clearing divider"></div>
 
-    {{if $.List.Medias}}
+    {{if $.Medias}}
         <table class="ui fixed striped unstackable large table">
             <tbody>
-                {{range $media := $.List.Medias}}
+                {{range $media := $.Medias}}
                     <tr>
                         <td class="twelve wide">
                             <div class="breakup">
