@@ -451,7 +451,7 @@ func archiverSave(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 		Error(w, err)
 		return
 	}
-	logger.Infof("created new media %q %q", media.ID, media.Title)
+	logger.Infof("created new media %q %q %d", media.ID, media.Title, media.Length)
 
 	archive.Add(id, source)
 	JSON(w, "OK")
