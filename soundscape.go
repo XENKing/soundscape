@@ -93,7 +93,7 @@ func DeleteMedia(id string) error {
 	db.Exec("DELETE FROM list_media WHERE media_id = ?", media.ID)
 	db.Delete(&media)
 
-	// Remove all list references to this media.
+/*	// Remove all list references to this media.
 	lists, err := ListLists()
 	if err != nil {
 		return err
@@ -102,7 +102,7 @@ func DeleteMedia(id string) error {
 		if err := l.RemoveMedia(media); err != nil {
 			return err
 		}
-	}
+	}*/
 
 	// Remove all media files.
 	files := []string{

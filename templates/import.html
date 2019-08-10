@@ -16,7 +16,7 @@
 <div class="ui container">
     <h3 class="ui header">YouTube</h3>
 
-    <form class="ui large form" action="/soundscape/import" method="GET">
+    <form class="ui large form" action="{{$.HTTPPrefix}}/import" method="GET">
         <div class="field">
             <div class="ui action input">
                 <input type="text" name="q" value="{{$.Query}}" placeholder="Search"
@@ -51,7 +51,7 @@
                                             class="plus icon"></i>Save to Library
                                 </button>
                                 <button class="toggler ui fluid green button"
-                                        data-url="/soundscape/archiver/save/{{$youtube.ID}}"><i class="plus icon"></i>Save
+                                        data-url="{{$.HTTPPrefix}}/archiver/save/{{$youtube.ID}}"><i class="plus icon"></i>Save
                                     to Library
                                 </button>
                             </div>
@@ -72,7 +72,7 @@
 
 <script>
     $(document).ready(function () {
-        poller('#jobs', '/soundscape/archiver/jobs', 2000);
+        poller('#jobs', '{{$.HTTPPrefix}}/archiver/jobs', 2000);
     });
 </script>
 

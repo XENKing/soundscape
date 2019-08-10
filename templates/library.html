@@ -3,7 +3,7 @@
 <div class="ui container">
     <h2 class="ui header">Library</h2>
 
-    <form class="ui small form" action="/soundscape/library" method="GET">
+    <form class="ui small form" action="{{$.HTTPPrefix}}/library" method="GET">
         <div class="fields">
             <div class="eight wide field">
                 <input type="text" name="q" value="{{$.Query}}" placeholder="Filter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -13,7 +13,7 @@
 
     {{if $.Query}}
         <div class="ui hidden divider"></div>
-        <a href="/soundscape/library" class="ui image label">{{$.Query}} <i class="delete icon"></i></a>
+        <a href="{{$.HTTPPrefix}}/library" class="ui image label">{{$.Query}} <i class="delete icon"></i></a>
     {{end}}
 
     {{if $.Medias}}
@@ -22,12 +22,12 @@
                 {{range $media := $.Medias}}
                     <tr>
                         <td class="nomobile two wide">
-                            <a href="/soundscape/media/view/{{$media.ID}}">
-                                <img class="thumbnail" src="/soundscape/media/thumbnail/{{$media.ID}}">
+                            <a href="{{$.HTTPPrefix}}/media/view/{{$media.ID}}">
+                                <img class="thumbnail" src="{{$.HTTPPrefix}}/media/thumbnail/{{$media.ID}}">
                             </a>
                         </td>
                         <td class="ten wide">
-                            <a href="/soundscape/media/view/{{$media.ID}}">
+                            <a href="{{$.HTTPPrefix}}/media/view/{{$media.ID}}">
                                 <div class="breakup ui small header">
                                     {{$media.Title}}
                                 </div>
@@ -35,8 +35,8 @@
                             {{range $list := $.Lists}}
                                 <div class="listbox">
                                     {{$hasmedia := $list.HasMedia $media}}
-                                    <button {{if $hasmedia}}style="display: none;"{{end}} class="{{if eq $.IsAdmin "admin"}}toggler {{end}}ui mini basic button" {{if eq $.IsAdmin "admin"}}data-url="/soundscape/add/{{$list.ID}}/{{$media.ID}}"{{end}}><i class="square outline icon"></i> {{$list.Title}}</button>
-                                    <button {{if not $hasmedia}}style="display: none;"{{end}} class="{{if eq $.IsAdmin "admin"}}toggler {{end}}ui mini green button" {{if eq $.IsAdmin "admin"}}data-url="/soundscape/remove/{{$list.ID}}/{{$media.ID}}"{{end}}><i class="checkmark box icon"></i> {{$list.Title}}</button>
+                                    <button {{if $hasmedia}}style="display: none;"{{end}} class="{{if eq $.IsAdmin "admin"}}toggler {{end}}ui mini basic button" {{if eq $.IsAdmin "admin"}}data-url="{{$.HTTPPrefix}}/add/{{$list.ID}}/{{$media.ID}}"{{end}}><i class="square outline icon"></i> {{$list.Title}}</button>
+                                    <button {{if not $hasmedia}}style="display: none;"{{end}} class="{{if eq $.IsAdmin "admin"}}toggler {{end}}ui mini green button" {{if eq $.IsAdmin "admin"}}data-url="{{$.HTTPPrefix}}/remove/{{$list.ID}}/{{$media.ID}}"{{end}}><i class="checkmark box icon"></i> {{$list.Title}}</button>
                                 </div>
                             {{end}}
                         </td>
@@ -44,7 +44,7 @@
                             {{duration $media.Length}}
                             {{if $.IsAdmin}}
                             &nbsp;&nbsp;
-                            <a href="/soundscape/media/delete/{{$media.ID}}?p={{$.Page}}&q={{$.Query}}" data-prompt="Delete {{$media.Title}}?" class="confirm"><i class="red trash icon"></i></a>
+                            <a href="{{$.HTTPPrefix}}/media/delete/{{$media.ID}}?p={{$.Page}}&q={{$.Query}}" data-prompt="Delete {{$media.Title}}?" class="confirm"><i class="red trash icon"></i></a>
                             {{end}}
                         </td>
                     </tr>
@@ -54,7 +54,7 @@
 
         <div class="ui fluid pagination menu">
             {{range $page := $.Pages}}
-                <a href="/soundscape/library?p={{$page}}{{if $.Query}}&q={{$.Query}}{{end}}" class="{{if eq $page $.Page}}active{{end}} item">{{$page}}</a>
+                <a href="{{$.HTTPPrefix}}/library?p={{$page}}{{if $.Query}}&q={{$.Query}}{{end}}" class="{{if eq $page $.Page}}active{{end}} item">{{$page}}</a>
             {{end}}
         </div>
 

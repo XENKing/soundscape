@@ -3,7 +3,7 @@
 <div class="ui container">
     <div class="ui hidden clearing divider"></div>
     {{if eq $.IsAdmin "admin"}}
-    <a class="ui right floated large green button" href="/soundscape/create"><i class="plus icon"></i>New Playlist</a>
+    <a class="ui right floated large green button" href="{{$.HTTPPrefix}}/create"><i class="plus icon"></i>New Playlist</a>
     {{end}}
     <h2 class="ui header">Playlists</h2>
 
@@ -16,20 +16,20 @@
                 <div class="column">
                     <div class="ui fluid raised card">
                         <div class="content">
-                            <a class="header" href="/soundscape/play/{{$list.ID}}">{{$list.Title}}</a>
+                            <a class="header" href="{{$.HTTPPrefix}}/play/{{$list.ID}}">{{$list.Title}}</a>
                         </div>
-                        <a class="image" href="/soundscape/play/{{$list.ID}}">
+                        <a class="image" href="{{$.HTTPPrefix}}/play/{{$list.ID}}">
                             {{if $list.Medias}}
                                 {{$media := index $list.Medias 0}}
-                                <img src="/soundscape/media/thumbnail/{{$media.ID}}">
+                                <img src="{{$.HTTPPrefix}}/media/thumbnail/{{$media.ID}}">
                             {{else}}
-                                <img src="/soundscape/static/default.jpg">
+                                <img src="{{$.HTTPPrefix}}/static/default.jpg">
                             {{end}}
                         </a>
                         <div class="extra content">
                             {{if eq $.IsAdmin "admin"}}
                             <div class="meta">
-                                <a class="right floated meta" href="/soundscape/edit/{{$list.ID}}"><i class="setting icon"></i> Edit</a>
+                                <a class="right floated meta" href="{{$.HTTPPrefix}}/edit/{{$list.ID}}"><i class="setting icon"></i> Edit</a>
                             </div>
                             {{end}}
                             <div class="category">
@@ -47,7 +47,7 @@
         <div class="ui large message">
             <div class="header">You have no playlists</div>
             <p>
-                Need help? Visit the <a href="/soundscape/help">help page</a> for more info.
+                Need help? Visit the <a href="{{$.HTTPPrefix}}/help">help page</a> for more info.
             </p>
         </div>
     {{end}}

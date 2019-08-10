@@ -29,6 +29,7 @@ type Response struct {
 	Request  *http.Request
 	Params   *httprouter.Params
 	HTTPHost string
+	HTTPPrefix string
 	Version  string
 	Backlink string
 	DiskInfo *DiskInfo
@@ -83,6 +84,7 @@ func NewResponse(r *http.Request, ps httprouter.Params) *Response {
 		User:     ps.ByName("user"),
 		IsAdmin:  ps.ByName("role"),
 		HTTPHost: httpHost,
+		HTTPPrefix: httpPrefix,
 		Version:  version,
 		Backlink: backlink,
 		DiskInfo: diskInfo,
@@ -445,8 +447,12 @@ func archiverSave(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 		Error(w, err)
 		return
 	}
+	length, err := strconv.ParseInt(ps.ByName("length"),10, 64)
+	if err != nil {
+		logger.Errorf("failed parse length %s", err)
+	}
 
-	media, err := NewMedia(vinfo.ID, vinfo.Author, vinfo.Title, int64(vinfo.Duration.Seconds()), source)
+	media, err := NewMedia(vinfo.ID, vinfo.Author, vinfo.Title, length, source)
 	if err != nil {
 		Error(w, err)
 		return
