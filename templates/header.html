@@ -21,25 +21,27 @@
 
     {{if $.User}}
         {{if $.Config.Get.AcceptTOS}}
-            <div class="navmenu ui inverted small menu">
-                {{if $.Backlink}}
-                    <a class="item" href="{{.Backlink}}"><i class="large home icon"></i></a>
-                {{end}}
-                <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="/soundscape/">Playlists</a>
-                <a class="item {{if eq $.Section "library"}}active{{end}}" href="/soundscape/library">Library</a>
-                {{if eq $.IsAdmin "admin"}}
-                    <a class="item {{if eq $.Section "import"}}active{{end}}" href="/soundscape/import">Import</a>
-                {{end}}
-                <a class="item {{if eq $.Section "create"}}active{{end}}" href="/soundscape/create"><i
-                            class="fitted plus icon"></i></a>
-                <div class="ui right dropdown item">
-                    <img src="/soundscape/static/logo.png">
-                    <div class="menu">
-                        <a href="/soundscape/logout" class="item"><i class="power icon"></i>Log out</a>
-                        <a target="_blank" class="item" href="https://github.com/xenking/soundscape"><i
-                                    class="github icon"></i>Open Source</a>
-                        <a href="/soundscape/help" class="{{if eq $.Section "help"}}active{{end}} item"><i
-                                    class="help icon"></i>Help</a>
+            <div class="navmenu ui inverted borderless nomargin stackable large menu">
+                <div class="ui container">
+                    {{if $.Backlink}}
+                        <a class="item" href="{{.Backlink}}"><i class="large home icon"></i></a>
+                    {{end}}
+                    <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="/soundscape/">Playlists</a>
+                    <a class="item {{if eq $.Section "library"}}active{{end}}" href="/soundscape/library">Library</a>
+                    {{if eq $.IsAdmin "admin"}}
+                        <a class="item {{if eq $.Section "import"}}active{{end}}" href="/soundscape/import">Import</a>
+                    {{end}}
+                    <a class="item {{if eq $.Section "create"}}active{{end}}" href="/soundscape/create"><i
+                                class="fitted plus icon"></i></a>
+                    <div class="ui right dropdown item">
+                        <img src="/soundscape/static/logo.png">
+                        <div class="menu">
+                            <a href="/soundscape/logout" class="item"><i class="power icon"></i>Log out</a>
+                            <a target="_blank" class="item" href="https://github.com/xenking/soundscape"><i
+                                        class="github icon"></i>Open Source</a>
+                            <a href="/soundscape/help" class="{{if eq $.Section "help"}}active{{end}} item"><i
+                                        class="help icon"></i>Help</a>
+                        </div>
                     </div>
                 </div>
             </div>
