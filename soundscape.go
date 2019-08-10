@@ -161,6 +161,7 @@ func FindMedia(id string) (*Media, error) {
 func loadMedia(id string) (*Media, error) {
 	var media Media
 	db.First(&media, "ID = ?", id)
+	logger.Debugf("load media %q", media)
 	return &media, db.Error
 }
 
@@ -212,6 +213,7 @@ func ListMedias() ([]*Media, error) {
 		}
 		medias = append(medias, m)
 	}
+	logger.Debugf("list media %q", medias)
 	return medias, nil
 }
 
@@ -308,6 +310,7 @@ func (l *List) File() string {
 func (l *List) Save() error {
 	l.Modified = time.Now()
 	db.Where(List{ID: l.ID}).Assign(&l).FirstOrCreate(&l)
+	logger.Debugf("list save %q", db.Error)
 	return db.Error
 }
 
@@ -328,6 +331,7 @@ func (l *List) TotalLength() (total int64) {
 	for _, m := range medias {
 		total += m.Length
 	}
+	logger.Debugf("total length %q", total)
 	return total
 }
 
@@ -335,6 +339,7 @@ func (l *List) TotalLength() (total int64) {
 func (l *List) MediasCount() int {
 	var medias []Media
 	db.Model(&l).Related(&medias, "Medias")
+	logger.Debugf("media count %q", len(medias))
 	return len(medias)
 }
 
@@ -388,6 +393,7 @@ func (l *List) RemoveMedia(media *Media) error {
 func FindList(id string) (*List, error) {
 	var list List
 	db.First(&list, "ID = ?", id)
+	logger.Debugf("find list %q", list)
 	return &list, db.Error
 }
 
@@ -420,5 +426,6 @@ func FindList(id string) (*List, error) {
 func ListLists() ([]*List, error) {
 	var lists []*List
 	db.Find(&lists)
+	logger.Debugf ("list list %q", lists)
 	return lists, db.Error
 }

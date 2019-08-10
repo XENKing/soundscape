@@ -562,6 +562,7 @@ func playList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	res.Section = "play"
 	var medias []*Media
 	db.Model(&list).Related(&medias, "Medias")
+	logger.Debugf("select playlist %q", medias)
 	res.Medias = medias
 	HTML(w, "play.html", res)
 }
@@ -650,6 +651,7 @@ func editList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	res.Section = "edit"
 	var medias []*Media
 	db.Model(&list).Related(&medias, "Medias")
+	logger.Debugf("edit list %q", medias)
 	res.Medias = medias
 	HTML(w, "edit.html", res)
 }
