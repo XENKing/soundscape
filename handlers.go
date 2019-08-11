@@ -447,12 +447,8 @@ func archiverSave(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 		Error(w, err)
 		return
 	}
-	length, err := strconv.ParseInt(ps.ByName("length"),10, 64)
-	if err != nil {
-		logger.Errorf("failed parse length %s", err)
-	}
 
-	media, err := NewMedia(vinfo.ID, vinfo.Author, vinfo.Title, length, source)
+	media, err := NewMedia(vinfo.ID, vinfo.Author, vinfo.Title, int64(vinfo.Duration.Seconds()), source)
 	if err != nil {
 		Error(w, err)
 		return
