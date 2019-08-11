@@ -3,7 +3,7 @@
 <div class="ui container">
     <h2 class="ui header">Library</h2>
 
-    <form class="ui small form" action="{{$.HTTPPrefix}}/library" method="GET">
+    <form class="ui large form" action="{{$.HTTPPrefix}}/library" method="GET">
         <div class="fields">
             <div class="eight wide field">
                 <input type="text" name="q" value="{{$.Query}}" placeholder="Filter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -15,7 +15,7 @@
         <div class="ui hidden divider"></div>
         <a href="{{$.HTTPPrefix}}/library" class="ui image label">{{$.Query}} <i class="delete icon"></i></a>
     {{end}}
-
+{{/* TODO: Rework play media: Need render player in bottom part of window and redirect with saving states and timings */}}
     {{if $.Medias}}
         <table class="ui fixed striped unstackable table">
             <tbody>

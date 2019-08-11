@@ -41,7 +41,7 @@ video, audio {
 }
 
 .ui.card > .image {
-    min-height: 268px;
+    min-height: 150px;
     background-color: #000;
 }
 

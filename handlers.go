@@ -360,6 +360,7 @@ func library(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 //
 
 func thumbnailMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// TODO: Fix thumbnails
 	media, err := FindMedia(ps.ByName("media"))
 	if err != nil {
 		Error(w, err)

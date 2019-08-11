@@ -317,7 +317,7 @@ func (l *List) Save() error {
 func (l *List) HasMedia(media *Media) bool {
 	var medias []Media
 	db.Model(&l).Related(&medias, "Medias")
-	for _, m := range l.Medias {
+	for _, m := range medias {
 		if m.ID == media.ID {
 			return true
 		}
@@ -335,12 +335,18 @@ func (l *List) TotalLength() (total int64) {
 	return total
 }
 
-// MediasCount ...
 func (l *List) MediasCount() int {
 	var medias []Media
 	db.Model(&l).Related(&medias, "Medias")
 	logger.Debugf("media count %q", len(medias))
 	return len(medias)
+}
+
+func (l *List) GetFirstElement() Media {
+	var medias []Media
+	db.Model(&l).Related(&medias, "Medias")
+	logger.Debugf("get thumbnail %q", medias[0])
+	return medias[0]
 }
 
 func (l *List) ShuffleMedia() error {
