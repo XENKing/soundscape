@@ -20,7 +20,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/disintegration/imaging"
 	"github.com/eduncan911/podcast"
-	"github.com/sogocze/ytdl"
+	"github.com/xenking/ytdl"
 	"github.com/julienschmidt/httprouter"
 )
 

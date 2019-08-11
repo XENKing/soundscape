@@ -12,7 +12,7 @@ RUN go get \
     github.com/dustin/go-humanize \
     github.com/julienschmidt/httprouter \
     github.com/eduncan911/podcast \
-    github.com/sogocze/ytdl \
+    github.com/xenking/ytdl \
     go.uber.org/zap \
     golang.org/x/crypto/acme/autocert \
     github.com/jinzhu/gorm \

@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sogocze/ytdl"
+	"github.com/xenking/ytdl"
 	log "github.com/sirupsen/logrus"
 )
 
