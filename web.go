@@ -161,10 +161,10 @@ func Auth(h httprouter.Handle, role string) httprouter.Handle {
 		var juser string
 		var jrole string
 
-		if role == "none" {
+/*		if role == "none" {
 			h(w, r, ps)
 			return
-		}
+		}*/
 
 		// If token, refresh it and send response
 		reqToken, tokErr := r.Cookie("X-Soundscape-Token")
@@ -183,9 +183,9 @@ func Auth(h httprouter.Handle, role string) httprouter.Handle {
 				Redirect(w, r, "/logout")
 			}
 		} else {
-			//if role != "none"{
+			if role != "none"{
 				Redirect(w, r, "/logout")
-			//}
+			}
 		}
 		h(w, r, ps)
 	}

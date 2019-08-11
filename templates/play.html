@@ -2,8 +2,9 @@
 
 <style>
     body {
-        background-color: rgba(0,0,0,.9);
+        background-color: rgba(0, 0, 0, .9);
     }
+
     .navmenu .item {
         color: #f1f1f1 !important;
     }
@@ -28,27 +29,32 @@
         <div id="playerbox">
             <table class="ui single line fixed inverted unstackable table">
                 <tbody>
-                    {{range $n, $media := $.Medias}}
+                {{range $n, $media := $.Medias}}
 
-                        <tr class="player-item" id="player-item-{{$n}}" data-index="{{$n}}">
-                            <td class="eleven wide">
-                                <div class="breakup">{{$media.Title}}</div>
-                            </td>
-                            <td class="three wide right aligned">
-                                {{duration $media.Length}}
-                            </td>
-                        </tr>
-                    {{end}}
+                    <tr class="player-item" id="player-item-{{$n}}" data-index="{{$n}}">
+                        <td class="eleven wide">
+                            <div class="breakup">{{$media.Title}}</div>
+                        </td>
+                        <td class="three wide right aligned">
+                            {{duration $media.Length}}
+                        </td>
+                    </tr>
+                {{end}}
                 </tbody>
             </table>
         </div>
-        {{if $.User}}
-            <div class="ui three large black icon buttons">
-                <a class="ui icon button" href="{{$.HTTPPrefix}}/shuffle/{{$.List.ID}}"><i class="random icon"></i></a>
-                <a class="ui icon button" rel="alternate" type="application/mpegurl" href="{{$.HTTPPrefix}}/m3u/{{$.List.ID}}">Open m3u</a>
-                <a class="ui icon button" rel="alternate" type="application/rss+xml" href="{{$.HTTPPrefix}}/podcast/{{$.List.ID}}"><i class="podcast icon"></i></a>
-            </div>
-        {{end}}
+        <div class="ui three large black icon buttons">
+            <a class="ui {{if not $.User}}disabled {{end}}icon button"
+                    {{if $.User}}
+                href="{{$.HTTPPrefix}}/shuffle/{{$.List.ID}}"
+                    {{end}}><i class="random icon"></i></a>
+            <button class="ui button" id="m3u_button"><i class="external alternate icon"></i></button>
+            <a class="ui {{if not $.User}}disabled {{end}}icon button"
+                    {{if $.User}}
+                rel="alternate" type="application/rss+xml"
+                href="{{$.HTTPPrefix}}/podcast/{{$.List.ID}}"
+                    {{end}}><i class="podcast icon"></i></a>
+        </div>
     </div>
 
 
@@ -66,13 +72,13 @@
 </div>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.player-pause').hide();
 
         // create playlist
         var playlist = [];
         {{range $media := $.Medias}}
-            playlist.push('{{$.HTTPPrefix}}/stream/{{$.List.ID}}/{{$media.ID}}.m4a');
+        playlist.push('{{$.HTTPPrefix}}/stream/{{$.List.ID}}/{{$media.ID}}.m4a');
         {{end}}
 
         // $playerbox
@@ -83,38 +89,42 @@
 
         // ctrl
         var ctrl = {
-            'paused': function() {
+            'paused': function () {
                 return $player[0].paused;
             },
-            'play': function() {
+            'play': function () {
                 $player[0].play();
                 // $player.focus();
             },
-            'pause': function() {
+            'pause': function () {
                 $player[0].pause()
                 // $player.focus();
             },
-            'playprev': function() {
+            'playprev': function () {
                 var n = parseInt($player.data('index'), 10);
                 n--;
                 ctrl.playitem(n, true);
             },
-            'playnext': function() {
+            'playnext': function () {
                 var n = parseInt($player.data('index'), 10);
                 n++;
                 ctrl.playitem(n, true);
             },
-            'playitem': function(n, scroll) {
-                if (n > playlist.length-1) { n = 0; }
-                if (n < 0) { n = playlist.length-1; }
+            'playitem': function (n, scroll) {
+                if (n > playlist.length - 1) {
+                    n = 0;
+                }
+                if (n < 0) {
+                    n = playlist.length - 1;
+                }
 
-                var $item = $('#player-item-'+n);
+                var $item = $('#player-item-' + n);
                 $('.player-item').removeClass('active');
                 $item.addClass('active');
 
                 if (scroll) {
                     var target = $item.height() * n;
-                    $playerbox.animate({ scrollTop: target }, 200);
+                    $playerbox.animate({scrollTop: target}, 200);
                 }
 
                 $player.attr('src', playlist[n]);
@@ -154,37 +164,47 @@
             ctrl.playitem(n, false);
         });
 
+        $('#m3u_button').click(function () {
+            var $temp = $("<input>");
+            var $templink = $("<a rel='alternate' type='application/mpegurl' href='{{$.HTTPPrefix}}/m3u/{{$.List.ID}}'>");
+            $("body").append($templink, $temp);
+            $temp.val($templink[0].href).select();
+            document.execCommand("copy");
+            $temp.remove();
+            $templink.remove();
+        });
+
         // on play
-        $player.on('play', function() {
+        $player.on('play', function () {
             $('.player-play').hide();
             $('.player-pause').show();
         });
 
         // on pause
-        $player.on('pause', function() {
+        $player.on('pause', function () {
             $('.player-pause').hide();
             $('.player-play').show();
         });
 
         {{if $.User}}
-            // volume change
-            var sendingVolume = false;
-            $player.on('volumechange', function() {
-                if (sendingVolume) {
-                    return;
-                }
-                sendingVolume = true;
-                var volume = $player.prop('volume').toFixed(2)/1;
-                $.post('{{$.HTTPPrefix}}/config', { "key": "volume", "value": volume }).always(function() {
-                    setTimeout(function() {
-                        sendingVolume = false;
-                    }, 1000);
-                });
+        // volume change
+        var sendingVolume = false;
+        $player.on('volumechange', function () {
+            if (sendingVolume) {
+                return;
+            }
+            sendingVolume = true;
+            var volume = $player.prop('volume').toFixed(2) / 1;
+            $.post('{{$.HTTPPrefix}}/config', {"key": "volume", "value": volume}).always(function () {
+                setTimeout(function () {
+                    sendingVolume = false;
+                }, 1000);
             });
+        });
         {{end}}
 
         // play the next item.
-        $player.on('ended', function() {
+        $player.on('ended', function () {
             var n = parseInt($(this).data('index'), 10);
             n++;
             ctrl.playitem(n, true);
@@ -198,7 +218,7 @@
         var KEY_N = 110;
         var KEY_P = 112;
 
-        $(document).keypress(function(e) {
+        $(document).keypress(function (e) {
             switch (e.which) {
                 // toggle play/pause
                 case KEY_SPACE:
