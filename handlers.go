@@ -37,7 +37,7 @@ type Response struct {
 
 	Error   string
 	User    string
-	IsAdmin string
+	Group string
 	Section string
 
 	// Paging
@@ -78,17 +78,17 @@ func NewResponse(r *http.Request, ps httprouter.Params) *Response {
 		panic(err)
 	}
 	return &Response{
-		Config:   config.Get(),
-		Request:  r,
-		Params:   &ps,
-		User:     ps.ByName("user"),
-		IsAdmin:  ps.ByName("role"),
-		HTTPHost: httpHost,
+		Config:     config.Get(),
+		Request:    r,
+		Params:     &ps,
+		User:       ps.ByName("user"),
+		Group:      ps.ByName("role"),
+		HTTPHost:   httpHost,
 		HTTPPrefix: httpPrefix,
-		Version:  version,
-		Backlink: backlink,
-		DiskInfo: diskInfo,
-		Archiver: archive,
+		Version:    version,
+		Backlink:   backlink,
+		DiskInfo:   diskInfo,
+		Archiver:   archive,
 	}
 }
 
@@ -208,6 +208,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	}
 
 	var juser string
+	var jrole string
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
@@ -217,10 +218,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 		token, err := jwt.Parse(reqToken.Value, func(t *jwt.Token) (interface{}, error) {
 			return []byte(secretKey), nil
 		})
-		if err == nil && token.Valid {
-			juser = token.Claims.(jwt.MapClaims)["user"].(string)
+		if claims,ok := token.Claims.(jwt.MapClaims); ok && err == nil && token.Valid {
+			juser = claims["user"].(string)
+			jrole = claims["role"].(string)
 			ps = append(ps, httprouter.Param{Key: "user", Value: juser})
-			ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
+			ps = append(ps, httprouter.Param{Key: "role", Value: jrole})
 			w.Header().Set("X-Soundscape-Token", "*")
 			Redirect(w, r, "/")
 			return
@@ -249,11 +251,13 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 				token := jwt.New(jwt.GetSigningMethod("HS256"))
 				claims := make(jwt.MapClaims)
 				claims["user"] = dbuser.Username
+				claims["role"] = dbuser.Role
 				claims["exp"] = time.Now().Add(time.Minute * 3600).Unix()
 				token.Claims = claims
 				tokenString, err := token.SignedString([]byte(secretKey))
 				ps = append(ps, httprouter.Param{Key: "user", Value: username})
-				ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
+				ps = append(ps, httprouter.Param{Key: "role", Value: dbuser.Role})
+				logger.Debugf("Added new token with user %s and role %s", username, dbuser.Role)
 				if err != nil {
 					panic(err)
 				}

@@ -45,7 +45,6 @@
         {{if $.User}}
             <div class="ui three large black icon buttons">
                 <a class="ui icon button" href="{{$.HTTPPrefix}}/shuffle/{{$.List.ID}}"><i class="random icon"></i></a>
-                <button class="ui button"></button>
                 <a class="ui icon button" rel="alternate" type="application/mpegurl" href="{{$.HTTPPrefix}}/m3u/{{$.List.ID}}">Open m3u</a>
                 <a class="ui icon button" rel="alternate" type="application/rss+xml" href="{{$.HTTPPrefix}}/podcast/{{$.List.ID}}"><i class="podcast icon"></i></a>
             </div>

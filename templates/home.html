@@ -2,7 +2,7 @@
 
 <div class="ui container">
     <div class="ui hidden clearing divider"></div>
-    {{if eq $.IsAdmin "admin"}}
+    {{if eq $.Group "admin"}}
     <a class="ui right floated large green button" href="{{$.HTTPPrefix}}/create"><i class="plus icon"></i>New Playlist</a>
     {{end}}
     <h2 class="ui header">Playlists</h2>
@@ -27,7 +27,7 @@
                             {{end}}
                         </a>
                         <div class="extra content">
-                            {{if eq $.IsAdmin "admin"}}
+                            {{if eq $.Group "admin"}}
                             <div class="meta">
                                 <a class="right floated meta" href="{{$.HTTPPrefix}}/edit/{{$list.ID}}"><i class="setting icon"></i> Edit</a>
                             </div>

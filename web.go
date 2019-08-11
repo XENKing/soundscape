@@ -59,7 +59,7 @@ var (
                 <title>Error</title>
             </head>
             <body>
-                <h2 style="color: orangered;">An error has occurred. <a href="/soundscape/logs">Check the logs</a></h2>
+                <h2 style="color: orangered;">An error has occurred. <a href="{{$.HTTPPrefix}}/logs">Check the logs</a></h2>
             </body>
         </html>
     `
@@ -159,6 +159,7 @@ func Auth(h httprouter.Handle, role string) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 		var juser string
+		var jrole string
 
 		if role == "none" {
 			h(w, r, ps)
@@ -171,16 +172,20 @@ func Auth(h httprouter.Handle, role string) httprouter.Handle {
 			token, err := jwt.Parse(reqToken.Value, func(t *jwt.Token) (interface{}, error) {
 				return []byte(secretKey), nil
 			})
-			if err == nil && token.Valid {
-				juser = token.Claims.(jwt.MapClaims)["user"].(string)
+			if claims,ok := token.Claims.(jwt.MapClaims); ok && err == nil && token.Valid {
+				juser = claims["user"].(string)
+				jrole = claims["role"].(string)
+				logger.Debugf("User %s | Role %s", juser, jrole)
 				ps = append(ps, httprouter.Param{Key: "user", Value: juser})
-				ps = append(ps, httprouter.Param{Key: "role", Value: "admin"})
+				ps = append(ps, httprouter.Param{Key: "role", Value: jrole})
 				w.Header().Set("X-Soundscape-Token", "*")
 			} else {
 				Redirect(w, r, "/logout")
 			}
 		} else {
-			Redirect(w, r, "/logout")
+			//if role != "none"{
+				Redirect(w, r, "/logout")
+			//}
 		}
 		h(w, r, ps)
 	}
