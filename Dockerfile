@@ -1,7 +1,7 @@
 FROM golang:1.9-alpine as build
 RUN apk add --no-cache git gcc musl-dev
 WORKDIR /go/src/github.com/xenking/soundscape
-ARG BUILD_VERSION=2.3
+ARG BUILD_VERSION=2.4
 ENV GODEBUG="netdns=go http2server=0"
 ENV GOPATH="/go"
 RUN go get \

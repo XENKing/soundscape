@@ -63,6 +63,9 @@ var (
 
 	// version
 	version string
+
+	// others global vars
+	lastfmAPIKey string
 )
 
 func init() {
@@ -76,10 +79,11 @@ func init() {
 	cli.StringVar(&httpUsername, "http-username", "soundscape", "HTTP basic auth username")
 	cli.Var(&httpAdmins, "http-admin", "HTTP basic auth user/password for admins.")
 	cli.Var(&httpReadOnlys, "http-read-only", "HTTP basic auth user/password for read only users.")
-	cli.StringVar(&httpPrefix, "http-prefix", "/soundscape", "HTTP URL prefix (not actually supported yet!)")
+	cli.StringVar(&httpPrefix, "http-prefix", "/soundscape", "HTTP URL prefix")
 	cli.BoolVar(&letsencrypt, "letsencrypt", false, "enable TLS using Let's Encrypt")
 	cli.StringVar(&reverseProxyAuthHeader, "reverse-proxy-header", "X-Authenticated-User", "reverse proxy auth header")
 	cli.StringVar(&reverseProxyAuthIP, "reverse-proxy-ip", "", "reverse proxy auth IP")
+	lastfmAPIKey = os.Getenv("LASTFM_API_KEY")
 }
 
 func main() {
@@ -215,7 +219,7 @@ func main() {
 	r.HandleMethodNotAllowed = false
 
 	// Handlers
-	r.GET("/", Log(Auth(index, "admin")))
+	r.GET("/", Log(Auth(index, "readonly")))
 	r.GET(Prefix("/logs"), Log(Auth(logs, "admin")))
 	r.GET(Prefix("/"), Log(Auth(home, "readonly")))
 	r.GET(Prefix(""), Log(Auth(home, "readonly")))
@@ -245,6 +249,9 @@ func main() {
 
 	// Import
 	r.GET(Prefix("/import"), Log(Auth(importHandler, "admin")))
+
+	// Search
+	r.GET(Prefix("/search"), Log(Auth(searchHandler, "admin")))
 
 	// Archiver
 	r.GET(Prefix("/archiver/jobs"), Auth(archiverJobs, "admin"))

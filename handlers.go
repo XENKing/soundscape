@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -13,6 +15,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/xenking/soundscape/internal/archiver"
 	"github.com/xenking/soundscape/internal/youtube"
@@ -37,7 +40,7 @@ type Response struct {
 
 	Error   string
 	User    string
-	Group string
+	Group   string
 	Section string
 
 	// Paging
@@ -54,11 +57,18 @@ type Response struct {
 	Lists  []*List
 	Media  *Media
 	Medias []*Media
+	DefaultMediaID   int
+	DefaultMediaTime int64
 
-	ActiveMedias []*Media
-	QueuedMedias []*Media
+	ActiveMedias  []*Media
+	QueuedMedias  []*Media
 
-	Youtubes []youtube.Video
+	Youtubes      []youtube.Video
+
+	LastFMEnabled bool
+	ArtistsList   []lastFMArtist
+	AlbumsList    []lastFMAlbum
+	TracksList    []lastFMTrack
 }
 
 const secretKey string = "ThisIsTooSecret"
@@ -89,6 +99,7 @@ func NewResponse(r *http.Request, ps httprouter.Params) *Response {
 		Backlink:   backlink,
 		DiskInfo:   diskInfo,
 		Archiver:   archive,
+		LastFMEnabled: lastfmAPIKey != "",
 	}
 }
 
@@ -277,6 +288,24 @@ func logoutHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	Redirect(w, r, "/login")
 }
 
+func searchHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var artists []lastFMArtist
+	var albums []lastFMAlbum
+	var tracks []lastFMTrack
+	if query := strings.TrimSpace(r.FormValue("q")); query != "" {
+		artists = searchArtists(query)
+		albums = searchAlbums(query)
+		tracks = searchTracks(query)
+	}
+
+	res := NewResponse(r, ps)
+	res.Section = "search"
+	res.ArtistsList = artists
+	res.AlbumsList = albums
+	res.TracksList = tracks
+	HTML(w, "search.html", res)
+}
+
 func library(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	medias, err := ListMedias()
 	if err != nil {
@@ -360,7 +389,6 @@ func library(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 //
 
 func thumbnailMedia(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// TODO: Fix thumbnails
 	media, err := FindMedia(ps.ByName("media"))
 	if err != nil {
 		Error(w, err)
@@ -535,7 +563,7 @@ func podcastList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Error(w, err)
 	}
 }
-
+// TODO Fix m3u update
 func m3uList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	list, err := FindList(ps.ByName("id"))
 	if err != nil {
@@ -571,6 +599,23 @@ func playList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	db.Model(&list).Related(&medias, "Medias")
 	logger.Debugf("select playlist %q", medias)
 	res.Medias = medias
+	res.DefaultMediaID = 0
+	res.DefaultMediaTime = 0
+
+	if query := strings.TrimSpace(r.FormValue("m")); query != "" {
+		// Default media ID
+		for k, m := range res.Medias {
+			if m.ID == query {
+				res.DefaultMediaID = k
+			}
+		}
+	}
+
+	if query := strings.TrimSpace(r.FormValue("t")); query != "" {
+		// Default time
+		res.DefaultMediaTime, _ = strconv.ParseInt(query, 10, 64)
+	}
+
 	HTML(w, "play.html", res)
 }
 
@@ -703,4 +748,55 @@ func v1status(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	fmt.Fprintf(w, "%s\n", status)
+}
+func getURL(url string) []byte {
+	fmt.Println("I GET:" + url)
+	client := &http.Client{
+		Timeout: time.Second * 2, // Maximum of 2 secs
+	}
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	req.Header.Set("User-Agent", "Soundscape")
+	res, getErr := client.Do(req)
+	if getErr != nil {
+		logger.Fatal(getErr)
+	}
+	defer res.Body.Close()
+	body, readErr := ioutil.ReadAll(res.Body)
+	if readErr != nil {
+		logger.Fatal(readErr)
+	}
+	return body
+}
+
+func searchArtists(query string) []lastFMArtist {
+	url := "http://ws.audioscrobbler.com/2.0/?method=artist.search&artist=" + query + "&api_key=" + lastfmAPIKey + "&format=json"
+	body := getURL(url)
+
+	var result lastFMArtistsResponse
+	json.Unmarshal([]byte(body), &result)
+
+	return result.Results.ArtistMatches.Artist
+}
+
+func searchAlbums(query string) []lastFMAlbum {
+	url := "http://ws.audioscrobbler.com/2.0/?method=album.search&album=" + query + "&api_key=" + lastfmAPIKey + "&format=json"
+	body := getURL(url)
+
+	var result lastFMAlbumResponse
+	json.Unmarshal([]byte(body), &result)
+
+	return result.Results.AlbumMatches.Album
+}
+
+func searchTracks(query string) []lastFMTrack {
+	url := "http://ws.audioscrobbler.com/2.0/?method=track.search&track=" + query + "&api_key=" + lastfmAPIKey + "&format=json"
+	body := getURL(url)
+
+	var result lastFMTrackResponse
+	json.Unmarshal([]byte(body), &result)
+
+	return result.Results.TrackMatches.Track
 }

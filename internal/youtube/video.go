@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/xenking/ytdl"
-	log "github.com/sirupsen/logrus"
+	//log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -228,8 +228,6 @@ func GetVideo(rawid string) (Video, error) {
 	if err != nil {
 		return Video{}, err
 	}
-	log.SetLevel(log.DebugLevel)
-	log.Printf("Video Length %s", length)
 
 	// Rating
 	rating, err := strconv.ParseFloat(args["avg_rating"].(string), 64)

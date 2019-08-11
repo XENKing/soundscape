@@ -25,7 +25,7 @@ func dbInit() {
 	if os.Getenv("MYSQL_DB") != "" {
 		db, err = gorm.Open("mysql", os.Getenv("MYSQL_USER")+":"+os.Getenv("MYSQL_PASSWORD")+"@tcp("+os.Getenv("MYSQL_HOST")+":"+os.Getenv("MYSQL_PORT")+")/"+os.Getenv("MYSQL_DB")+"?charset=utf8&parseTime=True&loc=Local")
 	} else {
-		db, err = gorm.Open("sqlite3", "./streamlist.db")
+		db, err = gorm.Open("sqlite3", "./soundscape.db")
 	}
 	if err != nil {
 		panic("failed to connect database")
