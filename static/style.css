@@ -23,21 +23,60 @@ video, audio {
     width: 100%;
 }
 
-.navmenu {
+/*.navmenu {
     border-radius: 0 !important;
-    background-color: #53a93f !important;
-}
+    background-color: #21BA45 !important;
+}*/
 
 .green.icon {
-    color: #53a93f !important;
+    color: #21BA45 !important;
 }
 
 .ui.green.button, .ui.primary.button {
-    background-color: #53a93f !important;
+    background-color: #21BA45 !important;
 }
 
-.navmenu img {
+.main.menu img {
     max-width: 2em;
+}
+
+.main.menu {
+    background-color: #21BA45 !important;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    transition:
+            box-shadow 0.5s ease,
+            padding 0.5s ease;
+}
+
+.main.menu.fixed {
+    background-color: #FFFFFF;
+    border: 1px solid #DDD;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.right.dropdown {
+    padding-bottom: 0px !important;
+    padding-top: 0px !important;
+}
+
+svg#logo{
+    height: 3em;
+    width: 3em;
+}
+svg#logo .fist{
+    transform-origin: center;
+    /* animation: fizzle 3s ease alternate infinite; */
+}
+
+@keyframes fizzle {
+    50% {
+        transform: scale(0.9) rotate(15deg);
+    }
+    100% {
+        transform: rotate(-15deg);
+    }
 }
 
 .ui.card > .image {
