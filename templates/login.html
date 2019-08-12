@@ -4,12 +4,12 @@
     <div class="ui container">
         <div class="ui middle aligned center aligned grid stackable">
             <div id="login" class="column">
-                <h2 class="ui image header">
+                <h2 class="ui header">
                     <div class="content">
-                        Sign-in
+                        Log-in to your account
                     </div>
                 </h2>
-                <form id="signin" action="{{$.HTTPPrefix}}/login" method="POST" class="ui small form">
+                <form id="signin" action="{{$.HTTPPrefix}}/login" method="POST" class="ui large form">
                     <div class="ui stacked secondary">
                         <div class="field">
                             <div class="ui left icon input">
@@ -25,14 +25,10 @@
                                        autocorrect="off" autocapitalize="off" spellcheck="false">
                             </div>
                         </div>
-                        <div class="field">
-                            <input class="ui button" type="submit" value="Login"/>
-                        </div>
+                        <input class="ui fluid large green submit button" type="submit" value="Login"/>
                     </div>
-
                     <div class="ui error message"></div>
                 </form>
-
             </div>
         </div>
     </div>
