@@ -9,8 +9,10 @@
     word-break: break-word;
 }
 
-.breakup.youtube.header {
-    min-height: 1.5em;
+.breakup.youtube.header {;
+    height: 2em;
+    max-height: 3em;
+    font-size: unset !important;
 }
 
 iframe {
@@ -54,9 +56,10 @@ video, audio {
 }
 
 .right.dropdown {
-    padding-bottom: 0px !important;
-    padding-top: 0px !important;
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
 }
+
 .ui.form input{
     border-color: #E0E1E2!important
 }
@@ -129,12 +132,18 @@ video {
 
 .listbox {
     display: inline-block;
-    float: left;
+    /*float: left;*/
     margin-top: 0.25rem;
 }
 
+
+.red.basic.button:hover {
+    background-color: #DB2828 !important;
+    color: #FFF !important;
+}
+
 #playerbox {
-    max-height: 300px;
+    max-height: 450px;
     overflow-y: scroll;
 }
 
