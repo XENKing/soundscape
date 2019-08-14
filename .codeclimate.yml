@@ -1,0 +1,40 @@
+---
+engines:
+  csslint:
+    enabled: true
+    checks:
+      important:
+        enabled: false
+      regex-selectors:
+        enabled: false
+      bulletproof-font-face:
+        enabled: false
+  duplication:
+    enabled: true
+    checks:
+      identical-code:
+        config:
+          threshold: 25
+      similar-code:
+        config:
+          threshold: 50
+    config:
+      languages:
+        - javascript
+        - go
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  gofmt:
+    enabled: true
+  golint:
+    enabled: true
+ratings:
+  paths:
+    - "**.css"
+    - "**.js"
+    - "**.go"
+exclude_patterns:
+  - "static/*.js"
+  - "static/semantic/**"

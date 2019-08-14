@@ -1,4 +1,8 @@
+
 # Soundscape - a personal music streaming server
+[![Codefresh build status]( https://g.codefresh.io/api/badges/pipeline/xenking/Soundscape%20github%2FSoundscape?type=cf-1)]( https://g.codefresh.io/public/accounts/xenking/pipelines/5d52d1f5ce70269d51b9d2f1)
+[![Code Climate]( https://api.codeclimate.com/v1/badges/37e03cff518aaf901247/maintainability)]( https://codeclimate.com/github/xenking/soundscape/maintainability)
+[![CircleCI](https://circleci.com/gh/xenking/soundscape.svg?style=svg)](https://circleci.com/gh/xenking/soundscape)
 
 ![Screencast](https://raw.githubusercontent.com/soundscapecloud/soundscape/master/screencast1.gif)
 

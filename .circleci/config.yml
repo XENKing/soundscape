@@ -1,4 +1,3 @@
-version: 2
 jobs:
   build:
     docker:
@@ -33,3 +32,9 @@ jobs:
             else
               echo "Not a tag, nothing to do here"
             fi
+
+workflows:
+  version: 2
+  soundscape:
+    jobs:
+        - build
