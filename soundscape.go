@@ -351,11 +351,14 @@ func (l *List) GetFirstElement() Media {
 
 func (l *List) ShuffleMedia() error {
 	r := rand.New(rand.NewSource(time.Now().Unix()))
+	var oldMedias []Media
 	var medias []*Media
-	for _, i := range r.Perm(len(l.Medias)) {
-		medias = append(medias, l.Medias[i])
+	db.Model(&l).Related(&oldMedias, "Medias")
+	for _, i := range r.Perm(len(oldMedias)) {
+		medias = append(medias, &oldMedias[i])
 	}
 	l.Medias = medias
+	logger.Debugf("Shuffle new medias %q", medias)
 	return l.Save()
 }
 

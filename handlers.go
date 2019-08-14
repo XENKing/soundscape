@@ -563,7 +563,6 @@ func podcastList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Error(w, err)
 	}
 }
-// TODO Fix m3u update
 func m3uList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	list, err := FindList(ps.ByName("id"))
 	if err != nil {
@@ -575,7 +574,9 @@ func m3uList(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	w.Header().Set("Content-Type", "application/mpegurl")
 	fmt.Fprintf(w, "#EXTM3U\n")
-	for _, media := range list.Medias {
+	var medias []Media
+	db.Model(&list).Related(&medias, "Medias")
+	for _, media := range medias {
 		fmt.Fprintf(w, "#EXTINF:%d,%s\n", media.Length, media.Title)
 		proto := r.Header.Get("X-Forwarded-Proto")
 		if proto == "" {
