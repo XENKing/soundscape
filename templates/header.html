@@ -51,13 +51,14 @@
                 <a class="item" href="{{.Backlink}}"><i class="large home icon"></i></a>
             {{end}}
             <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="{{$.HTTPPrefix}}/">Playlists</a>
-            <a class="item {{if eq $.Section "library"}}active{{end}}" href="{{$.HTTPPrefix}}/library">Library</a>
             {{if $.User}}
-                {{if eq $.Group "admin"}}
-                    <a class="item {{if eq $.Section "import"}}active{{end}}" href="{{$.HTTPPrefix}}/import">Import</a>
-                {{end}}
                 <a class="item {{if eq $.Section "create"}}active{{end}}" href="{{$.HTTPPrefix}}/create"><i
                             class="fitted plus icon"></i></a>
+            {{end}}
+            <a class="item {{if eq $.Section "library"}}active{{end}}" href="{{$.HTTPPrefix}}/library">Library</a>
+            {{if eq $.Group "admin"}}
+                <a class="item {{if eq $.Section "import"}}active{{end}}" href="{{$.HTTPPrefix}}/import">Import</a>
+                <a class="item {{if eq $.Section "search"}}active{{end}}" href="{{$.HTTPPrefix}}/search">Search</a>
             {{end}}
             <div class="ui right dropdown item">
                 {{template "logo.html" .}}
