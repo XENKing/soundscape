@@ -87,7 +87,7 @@ svg#logo .fist{
 }
 
 .ui.card > .image {
-    min-height: 150px;
+    min-height: 80px;
     background-color: #000;
 }
 
@@ -136,6 +136,9 @@ video {
     margin-top: 0.25rem;
 }
 
+.full.height {
+    margin-top: 3em;
+}
 
 .red.basic.button:hover {
     background-color: #DB2828 !important;

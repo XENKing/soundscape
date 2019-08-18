@@ -13,7 +13,7 @@
         <div class="ui stackable three column grid">
             {{range $list := $.Lists}}
                 <div class="column">
-                    <div class="ui fluid raised card">
+                    <div class="ui fluid raised card mobile hidden">
                         <div class="content">
                             <a class="header" href="{{$.HTTPPrefix}}/play/{{$list.ID}}">{{$list.Title}}</a>
                         </div>
@@ -35,6 +35,31 @@
                                     {{with $tl := $list.TotalLength}}{{duration $tl}}{{end}}
                                     ({{$list.MediasCount}} {{if gt $list.MediasCount 1}}songs{{else}}song{{end}})
                                 {{end}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui fluid horizontal card mobile only">
+                        <a class="image" href="{{$.HTTPPrefix}}/play/{{$list.ID}}">
+                            {{if $media := $list.GetFirstElement}}
+                                <img src="{{$.HTTPPrefix}}/media/thumbnail/{{$media.ID}}">
+                            {{else}}
+                                <img src="{{$.HTTPPrefix}}/static/default.jpg">
+                            {{end}}
+                        </a>
+                        <div class="content">
+                            <a class="header" href="{{$.HTTPPrefix}}/play/{{$list.ID}}">{{$list.Title}}</a>
+                            <div class="extra content">
+                                {{if eq $.Group "admin"}}
+                                    <div class="meta">
+                                        <a class="right floated meta" href="{{$.HTTPPrefix}}/edit/{{$list.ID}}"><i class="setting icon"></i> Edit</a>
+                                    </div>
+                                {{end}}
+                                <div class="category">
+                                    {{if $list.MediasCount}}
+                                        {{with $tl := $list.TotalLength}}{{duration $tl}}{{end}}
+                                        ({{$list.MediasCount}} {{if gt $list.MediasCount 1}}songs{{else}}song{{end}})
+                                    {{end}}
+                                </div>
                             </div>
                         </div>
                     </div>

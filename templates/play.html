@@ -23,6 +23,7 @@
             <button class="player-pause ui button"><i class="pause icon"></i></button>
             <button class="player-next ui button"><i class="right chevron icon"></i></button>
         </div>
+        <audio id="player" data-index="" preload="" controls=""></audio>
         <div class="ui three large black icon buttons">
             <a class="ui {{if not $.User}}disabled {{end}}icon button"
                     {{if $.User}}
@@ -35,7 +36,6 @@
                 href="{{$.HTTPPrefix}}/podcast/{{$.List.ID}}"
                     {{end}}><i class="podcast icon"></i></a>
         </div>
-        <audio id="player" data-index="" preload="" controls=""></audio>
         <div id="playerbox">
             <table class="ui single line fixed inverted unstackable table">
                 <tbody>
@@ -134,25 +134,25 @@
 
         // pause
         $('.player-pause').click(function (e) {
-            e.preventDefault()
+            e.preventDefault();
             ctrl.pause();
         });
 
         // play
         $('.player-play').click(function (e) {
-            e.preventDefault()
+            e.preventDefault();
             ctrl.play();
         });
 
         // prev
         $('.player-prev').click(function (e) {
-            e.preventDefault()
+            e.preventDefault();
             ctrl.playprev();
         });
 
         // next
         $('.player-next').click(function (e) {
-            e.preventDefault()
+            e.preventDefault();
             ctrl.playnext();
         });
 

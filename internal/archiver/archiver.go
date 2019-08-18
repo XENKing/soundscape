@@ -58,11 +58,12 @@ type Archiver struct {
 	debug       bool
 }
 
+/*// For debug
 func (a *Archiver) SetConcurrency(n int) {
 	a.lock("Concurrency")
 	defer a.unlock("Concurrency")
 	a.concurrency = n
-}
+}*/
 
 func (a *Archiver) Concurrency() int {
 	a.rlock("Concurrency")

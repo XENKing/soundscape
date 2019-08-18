@@ -22,9 +22,6 @@
         $(document)
             .ready(function () {
                 // fix main menu to page on passing
-                $('.main.menu').visibility({
-                    type: 'fixed'
-                });
                 // show dropdown on hover
                 $('.main.menu  .ui.dropdown').dropdown({
                     on: 'hover'
@@ -45,16 +42,16 @@
 
 
 {{if $.Config.Get.AcceptTOS}}
-    <div class="ui inverted borderless green stackable main menu">
+    <div class="ui inverted borderless green main menu fixed">
         <div class="ui container">
             {{if $.Backlink}}
                 <a class="item" href="{{.Backlink}}"><i class="large home icon"></i></a>
             {{end}}
-            <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="{{$.HTTPPrefix}}/"><i class="list ul icon mobile only"></i></i>Playlists</a>
-            <a class="item {{if eq $.Section "library"}}active{{end}}" href="{{$.HTTPPrefix}}/library"><i class="list ul icon mobile only"></i>Library</a>
+            <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="{{$.HTTPPrefix}}/"><i class="list ul icon mobile only"></i></i><span class="mobile hidden">Playlists</span></a>
+            <a class="item {{if eq $.Section "library"}}active{{end}}" href="{{$.HTTPPrefix}}/library"><i class="folder open outline icon mobile only"></i><span class="mobile hidden">Library</span></a>
             {{if eq $.Group "admin"}}
-                <a class="item {{if eq $.Section "import"}}active{{end}}" href="{{$.HTTPPrefix}}/import"><i class="file upload icon mobile only"></i>Import</a>
-                <a class="item {{if eq $.Section "search"}}active{{end}}" href="{{$.HTTPPrefix}}/search"><i class="search icon mobile only"></i>Search</a>
+                <a class="item {{if eq $.Section "import"}}active{{end}}" href="{{$.HTTPPrefix}}/import"><i class="upload icon mobile only"></i><span class="mobile hidden">Import</span></a>
+                <a class="item {{if eq $.Section "search"}}active{{end}}" href="{{$.HTTPPrefix}}/search"><i class="search icon mobile only"></i><span class="mobile hidden">Search</span></a>
             {{end}}
             <div class="ui right dropdown item">
                 {{template "logo.html" .}}
