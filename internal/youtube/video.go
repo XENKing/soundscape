@@ -308,7 +308,7 @@ func GET(ctx context.Context, rawurl string) (*http.Response, error) {
 	if ctx != nil {
 		req = req.WithContext(ctx)
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36")
 
 	return client.Do(req)
 }

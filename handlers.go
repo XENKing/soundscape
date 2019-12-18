@@ -2,16 +2,16 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha512"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
-	"crypto/sha512"
-	"encoding/hex"
 	"os"
-	"time"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -20,23 +20,22 @@ import (
 	"github.com/xenking/soundscape/internal/archiver"
 	"github.com/xenking/soundscape/internal/youtube"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/disintegration/imaging"
 	"github.com/eduncan911/podcast"
-	"github.com/xenking/ytdl"
 	"github.com/julienschmidt/httprouter"
+	"github.com/xenking/ytdl"
 )
 
 type Response struct {
-	Config   Config
-	Request  *http.Request
-	Params   *httprouter.Params
-	HTTPHost string
+	Config     Config
+	Request    *http.Request
+	Params     *httprouter.Params
+	HTTPHost   string
 	HTTPPrefix string
-	Version  string
-	Backlink string
-	DiskInfo *DiskInfo
-	Archiver *archiver.Archiver
+	Version    string
+	Backlink   string
+	DiskInfo   *DiskInfo
+	Archiver   *archiver.Archiver
 
 	Error   string
 	User    string
@@ -53,17 +52,17 @@ type Response struct {
 	// Search
 	Query string
 
-	List   *List
-	Lists  []*List
-	Media  *Media
-	Medias []*Media
+	List             *List
+	Lists            []*List
+	Media            *Media
+	Medias           []*Media
 	DefaultMediaID   int
 	DefaultMediaTime int64
 
-	ActiveMedias  []*Media
-	QueuedMedias  []*Media
+	ActiveMedias []*Media
+	QueuedMedias []*Media
 
-	Youtubes      []youtube.Video
+	Youtubes []youtube.Video
 
 	LastFMEnabled bool
 	ArtistsList   []lastFMArtist
@@ -88,17 +87,17 @@ func NewResponse(r *http.Request, ps httprouter.Params) *Response {
 		panic(err)
 	}
 	return &Response{
-		Config:     config.Get(),
-		Request:    r,
-		Params:     &ps,
-		User:       ps.ByName("user"),
-		Group:      ps.ByName("role"),
-		HTTPHost:   httpHost,
-		HTTPPrefix: httpPrefix,
-		Version:    version,
-		Backlink:   backlink,
-		DiskInfo:   diskInfo,
-		Archiver:   archive,
+		Config:        config.Get(),
+		Request:       r,
+		Params:        &ps,
+		User:          ps.ByName("user"),
+		Group:         ps.ByName("role"),
+		HTTPHost:      httpHost,
+		HTTPPrefix:    httpPrefix,
+		Version:       version,
+		Backlink:      backlink,
+		DiskInfo:      diskInfo,
+		Archiver:      archive,
 		LastFMEnabled: lastfmAPIKey != "",
 	}
 }
@@ -229,7 +228,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 		token, err := jwt.Parse(reqToken.Value, func(t *jwt.Token) (interface{}, error) {
 			return []byte(secretKey), nil
 		})
-		if claims,ok := token.Claims.(jwt.MapClaims); ok && err == nil && token.Valid {
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && err == nil && token.Valid {
 			juser = claims["user"].(string)
 			jrole = claims["role"].(string)
 			ps = append(ps, httprouter.Param{Key: "user", Value: juser})
@@ -753,21 +752,21 @@ func v1status(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func getURL(url string) []byte {
 	fmt.Println("I GET:" + url)
 	client := &http.Client{
-		Timeout: time.Second * 2, // Maximum of 2 secs
+		Timeout: time.Second * 8, // Maximum of 8 secs
 	}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Error(err)
 	}
 	req.Header.Set("User-Agent", "Soundscape")
 	res, getErr := client.Do(req)
 	if getErr != nil {
-		logger.Fatal(getErr)
+		logger.Error(getErr)
 	}
 	defer res.Body.Close()
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		logger.Fatal(readErr)
+		logger.Error(readErr)
 	}
 	return body
 }

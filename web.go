@@ -175,7 +175,6 @@ func Auth(h httprouter.Handle, role string) httprouter.Handle {
 			if claims,ok := token.Claims.(jwt.MapClaims); ok && err == nil && token.Valid {
 				juser = claims["user"].(string)
 				jrole = claims["role"].(string)
-				logger.Debugf("User %s | Role %s", juser, jrole)
 				ps = append(ps, httprouter.Param{Key: "user", Value: juser})
 				ps = append(ps, httprouter.Param{Key: "role", Value: jrole})
 				w.Header().Set("X-Soundscape-Token", "*")
