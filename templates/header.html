@@ -10,10 +10,8 @@
 
     <title>Soundscape</title>
 
-    <link rel="stylesheet" type="text/css" href="{{$.HTTPPrefix}}/static/roboto.css">
     <link rel="stylesheet" type="text/css" href="{{$.HTTPPrefix}}/static/semantic/semantic.min.css">
-    <link rel="stylesheet" type="text/css" href="{{$.HTTPPrefix}}/static/semantic/components/header.min.css">
-    <link rel="stylesheet" type="text/css" href="{{$.HTTPPrefix}}/static/style.css?version=12345">
+    <link rel="stylesheet" type="text/css" href="{{$.HTTPPrefix}}/static/style.css">
 
     <script src="{{$.HTTPPrefix}}/static/jquery.min.js"></script>
     <script src="{{$.HTTPPrefix}}/static/jquery.bigtext.js"></script>
@@ -21,18 +19,17 @@
     <script>
         $(document)
             .ready(function () {
-                // fix main menu to page on passing
                 // show dropdown on hover
-                $('.main.menu  .ui.dropdown').dropdown({
+                $('.main.menu .ui.dropdown').dropdown({
                     on: 'hover'
                 });
                 // logo hover animation
-                $("svg#logo").on('mouseenter touchstart', function() {
-                    $( this ).find(".fist").css( "animation", "fizzle 2s ease alternate infinite" );
+                $("svg#logo").on('mouseenter touchstart', function () {
+                    $(this).find(".fist").css("animation", "fizzle 2s ease alternate infinite");
                 });
 
-                $("svg#logo").on('mouseleave', function() {
-                    $( this ).find(".fist").css( "animation", "" );
+                $("svg#logo").on('mouseleave', function () {
+                    $(this).find(".fist").css("animation", "");
                 });
             })
         ;
@@ -47,11 +44,15 @@
             {{if $.Backlink}}
                 <a class="item" href="{{.Backlink}}"><i class="large home icon"></i></a>
             {{end}}
-            <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="{{$.HTTPPrefix}}/"><i class="list ul icon mobile only"></i></i><span class="mobile hidden">Playlists</span></a>
-            <a class="item {{if eq $.Section "library"}}active{{end}}" href="{{$.HTTPPrefix}}/library"><i class="folder open outline icon mobile only"></i><span class="mobile hidden">Library</span></a>
+            <a class="item {{if eq $.Section "home" "edit" "play"}}active{{end}}" href="{{$.HTTPPrefix}}/"><i
+                        class="list ul icon mobile only"></i></i><span class="mobile hidden">Playlists</span></a>
+            <a class="item {{if eq $.Section "library"}}active{{end}}" href="{{$.HTTPPrefix}}/library"><i
+                        class="folder open outline icon mobile only"></i><span class="mobile hidden">Library</span></a>
             {{if eq $.Group "admin"}}
-                <a class="item {{if eq $.Section "import"}}active{{end}}" href="{{$.HTTPPrefix}}/import"><i class="upload icon mobile only"></i><span class="mobile hidden">Import</span></a>
-                <a class="item {{if eq $.Section "search"}}active{{end}}" href="{{$.HTTPPrefix}}/search"><i class="search icon mobile only"></i><span class="mobile hidden">Search</span></a>
+                <a class="item {{if eq $.Section "import"}}active{{end}}" href="{{$.HTTPPrefix}}/import"><i
+                            class="mobile only icon download"></i><span class="mobile hidden">Import</span></a>
+                <a class="item {{if eq $.Section "search"}}active{{end}}" href="{{$.HTTPPrefix}}/search"><i
+                            class="search icon mobile only"></i><span class="mobile hidden">Search</span></a>
             {{end}}
             <div class="ui right dropdown item">
                 {{template "logo.html" .}}
