@@ -1,0 +1,56 @@
+version: "3.3"
+services:
+  soundscape:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: xenking/soundscape:local
+    depends_on:
+      - db
+    container_name: soundscape-worker
+    restart: always
+    networks:
+      - soundscape
+      - web
+    ports:
+      - 7997:80
+    volumes:
+      - $HOME/Music/data
+      - soundscape-db-sqlite:/data/soundscape.db
+    env_file:
+      - config.env
+      - db.env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.soundscape.rule=Host(`music.xenking.pro`)
+      - traefik.http.routers.soundscape.entrypoints=https
+      - traefik.http.routers.soundscape.service=soundscape
+      - "traefik.http.routers.soundscape.tls=true"
+      - "traefik.http.routers.soundscape.tls.certresolver=main"
+      - "traefik.http.routers.soundscape.tls.domains[0].main=music.xenking.pro"
+      - "traefik.http.routers.soundscape.tls.domains[0].sans=music.xenking.pro"
+      - traefik.http.services.soundscape.loadbalancer.server.port=80
+
+  db:
+    image: mysql:latest
+    container_name: soundscape-db
+    restart: always
+    networks:
+      - soundscape
+    env_file:
+      - db.env
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    volumes:
+      - soundscape-db-mysql:/var/lib/mysql
+volumes:
+  soundscape-db-mysql:
+  soundscape-db-sqlite:
+
+networks:
+  web:
+    external: true
+  soundscape:
+    driver: bridge
